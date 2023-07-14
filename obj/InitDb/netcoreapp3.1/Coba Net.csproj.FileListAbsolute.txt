@@ -77,3 +77,4 @@ C:\Users\arzir\OneDrive\Documents\Coba Net\obj\InitDb\netcoreapp3.1\staticwebass
 C:\Users\arzir\OneDrive\Documents\Coba Net\obj\InitDb\netcoreapp3.1\Coba Net.dll
 C:\Users\arzir\OneDrive\Documents\Coba Net\obj\InitDb\netcoreapp3.1\Coba Net.pdb
 C:\Users\arzir\OneDrive\Documents\Coba Net\obj\InitDb\netcoreapp3.1\Coba Net.genruntimeconfig.cache
+C:\Users\arzir\OneDrive\Documents\Coba Net\obj\InitDb\netcoreapp3.1\Razor\Views\Car\Add.cshtml.g.cs

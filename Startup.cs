@@ -27,11 +27,18 @@ namespace Coba_Net
         {
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
+            services.AddTransient<InitDb>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var serviceScope = app.ApplicationServices.CreateScope())
+            {
+                var InitDb = serviceScope.ServiceProvider.GetService<InitDb>();
+                InitDb.Initialize();
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

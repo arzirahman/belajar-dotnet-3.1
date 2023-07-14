@@ -8,5 +8,7 @@ namespace Coba_Net.Data
         public AppDb(DbContextOptions<AppDb> options) : base(options) { }
 
         public DbSet<Car> Cars { get; set; }
+
+        public DbSet<User> User { get; set; }
     }
 }
