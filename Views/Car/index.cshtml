@@ -1,0 +1,134 @@
+@model CarListView
+@{
+    ViewData["Title"] = "Car List";
+}
+
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto">
+    <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+        <span>Car List:</span>
+    </div>
+
+    <div class="px-10 w-full justify-between flex">
+        <div class="flex w-[400px] gap-4">
+            <form action="/Car/Index" method="get" class="flex flex-1 rounded-lg bg-[#4e4f3e] text-white">
+                <div class="flex-1">
+                    <input name="search" value="@Model.Pagination.Search" class="bg-transparent w-full h-full p-2 pl-4 rounded-l-lg" />
+                </div>
+                <div class="flex justify-center items-center px-4">
+                    <button type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+            <a href="/Car/Add">
+                <button class="bg-[#104152] pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    <span class="text-base">Add Car</span>
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="px-10 w-full">
+        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full">
+            @if (Model.Cars.Count > 0)
+            {
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="p-3 text-lg">Name</th>
+                            <th class="p-3 text-lg">Brand</th>
+                            <th class="p-3 text-lg">Color</th>
+                            <th class="p-3 text-lg">Price</th>
+                            <th class="p-3 text-lg">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var car in Model.Cars)
+                        {
+                            <tr>
+                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Name</td>
+                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Brand</td>
+                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Color</td>
+                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Price</td>
+                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">
+                                    <div class="flex justify-center items-center gap-3">
+                                        <a href="/Car/Edit?Id=@car.Id">
+                                            <button class="p-2 rounded-md bg-[#EF8E33]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                                </svg>
+                                            </button>
+                                        </a>
+                                        <form action="/Car/Delete" method="post">
+                                            <input type="hidden" name="id" value="@car.Id" />
+                                            <button class="p-2 rounded-md bg-[#D72630]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="flex p-4 px-6 w-full justify-between">
+                    <div>Showing <strong class="text-[#03dac5]">@(1 + " - " + Model.Cars.Count)</strong> From <strong class="text-[#03dac5]">@(Model.Pagination.DataCount)</strong> Data</div>
+                    <div class="flex gap-2 items-center">
+                        @if (Model.Pagination.HasPrevPage())
+                        {
+                            <a href="/Car/Index?page=@(Model.Pagination.Page - 1)&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class="text-[#03dac5]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                </svg>
+                            </a>
+                        }
+
+                        @if (Model.Pagination.TotalPages > 6)
+                        {
+                            <a href='/Car/Index?page=1&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsFirstPage()) ? "font-bold text-[#03dac5]" : "")'>1</a>
+                            <span>..</span>
+                            <a href='/Car/Index?page=@(Model.Pagination.IsCenterPage() ? Model.Pagination.Page : Model.Pagination.GetCenterPage())&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsCenterPage()) ? "font-bold text-[#03dac5]" : "")'>
+                                @(Model.Pagination.IsCenterPage() ? Model.Pagination.Page : Model.Pagination.GetCenterPage())
+                            </a>
+                            <span>..</span>
+                            <a href='/Car/Index?page=@Model.Pagination.TotalPages&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsLastPage()) ? "font-bold text-[#03dac5]" : "")'>@Model.Pagination.TotalPages</a>
+                        }
+                        else
+                        {
+                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                            {
+                                <a href="/Car/Index?page=@i&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class='@((Model.Pagination.Page == i) ? "font-bold text-[#03dac5]" : "")'>@i</a>
+                            }
+                        }
+
+                        @if (Model.Pagination.HasNextPage())
+                        {
+                            <a href="/Car/Index?page=@(Model.Pagination.Page + 1)&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class="text-[#03dac5]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="flex flex-col items-center w-full gap-10 p-10 bg-[#1e1e1e] rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                    <span class="text-2xl">Data Not Found</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
