@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "E0zYwG5TWaUS8eY1xEElBS3PRXKmhg2ehonht+b0ksUaX4e6NrzjI/PJv1z0EFhnUmwSSISUHLhsFS7T9KumLA==",
+  "dgSpecHash": "06i5R3b+NJxsVO8nzkkKe+JgUjdTHzzDF8DG0GJFdrhSJzu8dy9NiYXv+r16Ls4zk2ytUeYNXs0JSiRLSnqMsg==",
   "success": true,
   "projectFilePath": "C:\\Users\\arzir\\OneDrive\\Documents\\Coba Net\\Coba Net.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\arzir\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\3.1.20\\microsoft.aspnetcore.authentication.jwtbearer.3.1.20.nupkg.sha512",
     "C:\\Users\\arzir\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "C:\\Users\\arzir\\.nuget\\packages\\microsoft.bcl.hashcode\\1.1.1\\microsoft.bcl.hashcode.1.1.1.nupkg.sha512",
     "C:\\Users\\arzir\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",

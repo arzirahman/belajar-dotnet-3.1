@@ -10,5 +10,10 @@ namespace Coba_Net.Data
         public DbSet<Car> Cars { get; set; }
 
         public DbSet<User> User { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+        }
     }
 }

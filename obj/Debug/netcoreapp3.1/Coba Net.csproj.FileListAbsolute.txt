@@ -78,3 +78,5 @@ C:\Users\arzir\OneDrive\Documents\Coba Net\bin\Debug\netcoreapp3.1\runtimes\win\
 C:\Users\arzir\OneDrive\Documents\Coba Net\obj\Debug\netcoreapp3.1\Razor\Views\Car\index.cshtml.g.cs
 C:\Users\arzir\OneDrive\Documents\Coba Net\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Design.dll
 C:\Users\arzir\OneDrive\Documents\Coba Net\obj\Debug\netcoreapp3.1\Razor\Views\Car\Add.cshtml.g.cs
+C:\Users\arzir\OneDrive\Documents\Coba Net\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\arzir\OneDrive\Documents\Coba Net\obj\Debug\netcoreapp3.1\Razor\Views\User\Login.cshtml.g.cs

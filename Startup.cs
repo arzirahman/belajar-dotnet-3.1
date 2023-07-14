@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Coba_Net.Data;
+using Coba_Net.Services;
 
 namespace Coba_Net
 {
@@ -28,6 +29,7 @@ namespace Coba_Net
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
             services.AddTransient<InitDb>();
+            services.AddScoped<IJwtService, JwtService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +57,7 @@ namespace Coba_Net
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseMiddleware<Session>();
 
             app.UseEndpoints(endpoints =>
             {

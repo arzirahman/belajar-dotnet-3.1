@@ -16241,6 +16241,11 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "c:\\Users\\arzir\\OneDrive\\Documents\\Coba Net\\Views\\User\\Login.cshtml",
+      "TargetPath": "Views\\User\\Login.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "c:\\Users\\arzir\\OneDrive\\Documents\\Coba Net\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
       "TargetPath": "Views\\Shared\\_ValidationScriptsPartial.cshtml",
       "FileKind": "mvc"
