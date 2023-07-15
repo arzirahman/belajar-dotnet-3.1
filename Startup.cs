@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Coba_Net.Data;
-using Coba_Net.Services;
+using Coba_Net.Middlewares;
 
 namespace Coba_Net
 {
@@ -29,7 +29,6 @@ namespace Coba_Net
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
             services.AddTransient<InitDb>();
-            services.AddScoped<IJwtService, JwtService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +56,24 @@ namespace Coba_Net
 
             app.UseRouting();
 
-            app.UseMiddleware<Session>();
+            var protectedRoutes = new List<string> 
+            { 
+               "/", "/Home", "/Home/index", "/Home/Privacy", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit" 
+            };
+
+            var unprotectedRoutes = new List<string> { "/User/Login" };
+
+            app.UseWhen(context => protectedRoutes.Contains(context.Request.Path), builder =>
+            {
+                builder.UseMiddleware<Session>();
+                builder.UseAuthorization();
+            });
+
+            app.UseWhen(context => unprotectedRoutes.Contains(context.Request.Path), builder =>
+            {
+                builder.UseMiddleware<EmptySession>();
+                builder.UseAuthorization();
+            });
 
             app.UseEndpoints(endpoints =>
             {

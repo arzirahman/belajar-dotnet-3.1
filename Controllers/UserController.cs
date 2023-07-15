@@ -10,6 +10,7 @@ using Coba_Net.Data;
 using Coba_Net.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Coba_Net.Controllers
 {
@@ -17,13 +18,13 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly AppDb _context;
-        private readonly IJwtService _jwtService;
+        private readonly Jwt _jwt;
 
-        public UserController(ILogger<UserController> logger, AppDb context, IJwtService jwtService)
+        public UserController(ILogger<UserController> logger, AppDb context, IConfiguration configuration)
         {
             _logger = logger;
             _context = context;
-            _jwtService = jwtService;
+            _jwt = new Jwt(configuration);
         }
 
         [HttpGet]
@@ -45,10 +46,9 @@ namespace Coba_Net.Controllers
             }
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.Email, user.Email)
             };
-            var claimsIdentity = new ClaimsIdentity(claims, "Login");
-            var token = _jwtService.GenerateToken(claimsIdentity);
+            var token = _jwt.GenerateToken(claims);
             Response.Cookies.Append("session", token, new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),

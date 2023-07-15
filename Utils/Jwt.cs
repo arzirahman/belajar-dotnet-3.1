@@ -6,21 +6,17 @@ using System.IO;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Coba_Net.Services
 {
-    public interface IJwtService
-    {
-        string GenerateToken(ClaimsIdentity claimsIdentity);
-        ClaimsPrincipal ValidateToken(string token);
-    }
 
-    public class JwtService : IJwtService
+    public class Jwt
     {
         private readonly IConfiguration _configuration;
         private readonly byte[] _secretKey;
 
-        public JwtService(IConfiguration configuration)
+        public Jwt(IConfiguration configuration)
         {
             _configuration = configuration;
             string secretKeyPath = configuration["JwtSettings:SecretKeyPath"];
@@ -28,7 +24,7 @@ namespace Coba_Net.Services
             _secretKey = Encoding.UTF8.GetBytes(secretKey);
         }
 
-        public string GenerateToken(ClaimsIdentity claimsIdentity)
+        public string GenerateToken(List<Claim> claims)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(_secretKey);
@@ -37,7 +33,7 @@ namespace Coba_Net.Services
             var tokenOptions = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
-                claims: claimsIdentity.Claims,
+                claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:ExpirationTime"])),
                 signingCredentials: signingCredentials
             );
