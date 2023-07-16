@@ -46,7 +46,8 @@ namespace Coba_Net.Controllers
             }
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Name)
             };
             var token = _jwt.GenerateToken(claims);
             Response.Cookies.Append("session", token, new CookieOptions

@@ -1,0 +1,40 @@
+<div class="flex p-4 px-6 w-full justify-between">
+    <div>Showing <strong class="text-[#03dac5]">@(1 + " - " + Model.Count)</strong> From <strong class="text-[#03dac5]">@(Model.Pagination.DataCount)</strong> Data</div>
+    <div class="flex gap-2 items-center">
+        @if (Model.Pagination.HasPrevPage())
+        {
+            <a href="@Model.Path?page=@(Model.Pagination.Page - 1)&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class="text-[#03dac5]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+            </a>
+        }
+
+        @if (Model.Pagination.TotalPages > 6)
+        {
+            <a href='@Model.Path?page=1&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsFirstPage()) ? "font-bold text-[#03dac5]" : "")'>1</a>
+            <span>..</span>
+            <a href='@Model.Path?page=@(Model.Pagination.IsCenterPage() ? Model.Pagination.Page : Model.Pagination.GetCenterPage())&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsCenterPage()) ? "font-bold text-[#03dac5]" : "")'>
+                @(Model.Pagination.IsCenterPage() ? Model.Pagination.Page : Model.Pagination.GetCenterPage())
+            </a>
+            <span>..</span>
+            <a href='@Model.Path?page=@Model.Pagination.TotalPages&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search' class='@((Model.Pagination.IsLastPage()) ? "font-bold text-[#03dac5]" : "")'>@Model.Pagination.TotalPages</a>
+        }
+        else
+        {
+            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+            {
+                <a href="@Model.Path?page=@i&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class='@((Model.Pagination.Page == i) ? "font-bold text-[#03dac5]" : "")'>@i</a>
+            }
+        }
+
+        @if (Model.Pagination.HasNextPage())
+        {
+            <a href="@Model.Path?page=@(Model.Pagination.Page + 1)&amp;limit=@Model.Pagination.Limit&amp;search=@Model.Pagination.Search" class="text-[#03dac5]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            </a>
+        }
+    </div>
+</div>

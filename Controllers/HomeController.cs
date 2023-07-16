@@ -20,11 +20,15 @@ namespace Coba_Net.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Email"] = HttpContext.Items["Email"];
+            ViewData["Name"] = HttpContext.Items["Name"];
             return View();
         }
 
         public IActionResult Privacy()
         {
+            ViewData["Email"] = HttpContext.Items["Email"];
+            ViewData["Name"] = HttpContext.Items["Name"];
             return View();
         }
 

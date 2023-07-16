@@ -29,14 +29,19 @@ namespace Coba_Net.Middlewares
                 context.Response.Redirect("/User/Login");
                 return;
             }
-            var filterClaim = claims.Claims.Where(claim => claim.Type == ClaimTypes.Email);
-            var token = _jwt.GenerateToken(new List<Claim>(filterClaim));
+            if (context.Request.Path == "/") context.Response.Redirect("/Home");
+            var filterClaims = claims.Claims.Where(claim => claim.Type == ClaimTypes.Email || claim.Type == ClaimTypes.Name);
+            var token = _jwt.GenerateToken(new List<Claim>(filterClaims));
             context.Response.Cookies.Append("session", token, new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
                 HttpOnly = true,
                 Secure = false
             });
+            var emailClaim = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+            var nameClaim = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
+            context.Items["Email"] = emailClaim;
+            context.Items["Name"] = nameClaim;
             await _next(context);
         }
     }
