@@ -3,14 +3,15 @@
     ViewData["Title"] = "Car List";
 }
 
-<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto">
+@await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>Car List:</span>
     </div>
 
     <div class="px-10 w-full justify-between flex">
         <div class="flex w-[400px] gap-4">
-            <form action="/Car/Index" method="get" class="flex flex-1 rounded-lg bg-[#4e4f3e] text-white">
+            <form action="/Car/Index" method="get" class="flex flex-1 rounded-lg bg-[#4e4f3e] shadow-lg text-white">
                 <div class="flex-1">
                     <input name="search" value="@Model.Pagination.Search" class="bg-transparent w-full h-full p-2 pl-4 rounded-l-lg" />
                 </div>
@@ -23,7 +24,7 @@
                 </div>
             </form>
             <a href="/Car/Add">
-                <button class="bg-[#104152] pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                <button class="bg-[#104152] shadow-lg pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                     </svg>
@@ -51,11 +52,11 @@
                         @foreach (var car in Model.Cars)
                         {
                             <tr>
-                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Name</td>
-                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Brand</td>
-                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Color</td>
-                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">@car.Price</td>
-                                <td class="p-2 bg-[#1D3E3E] border-y-[2px] border-[#121212] text-center">
+                                <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@car.Name</td>
+                                <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@car.Brand</td>
+                                <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@car.Color</td>
+                                <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@car.Price</td>
+                                <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">
                                     <div class="flex justify-center items-center gap-3">
                                         <a href="/Car/Edit?Id=@car.Id">
                                             <button class="p-2 rounded-md bg-[#EF8E33] hover:scale-105 transition-all duration-300">

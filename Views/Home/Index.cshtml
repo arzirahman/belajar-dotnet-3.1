@@ -2,7 +2,11 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Anjay</h1>
+@await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
+<div class="text-center flex-1">
+    <h1 class="display-4">Hello World</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <form action="/User/Logout" method="post" class="flex w-full justify-center">
+        <button type="submit" class="px-6 bg-[#104152] pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 text-center transition-all duration-300 font-bold text-3xl rounded-lg">Logout</button>
+    </form>
 </div>

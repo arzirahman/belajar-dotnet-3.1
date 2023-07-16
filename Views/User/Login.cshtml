@@ -7,11 +7,11 @@
     <form action="/User/Login" method="post" class="bg-[#1e1e1e] flex flex-col gap-4 shadow-lg rounded-xl w-full p-6 max-w-[400px]">
         <div class="flex flex-col gap-2">
             <label for="Email" class="font-bold">Email:</label>
-            <input name="Email" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px]' required>
+            <input name="Email" class='bg-[#4e4f3e] p-2 px-4 rounded-md' required>
         </div>
         <div class="flex flex-col gap-2">
             <label for="Password" class="font-bold">Password:</label>
-            <input type="password" name="Password" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px]' required>
+            <input type="password" name="Password" class='bg-[#4e4f3e] p-2 px-4 rounded-md' required>
         </div>
         <span class='text-red-500 @(Model.ErrorMessage != null ? "" : "hidden")'>@(Model.ErrorMessage)</span>
         <div class="flex justify-center w-full">

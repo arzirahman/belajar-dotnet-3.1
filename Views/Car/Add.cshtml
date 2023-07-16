@@ -3,34 +3,37 @@
     ViewData["Title"] = Model.Id == Guid.Empty ? "Add Car" : "Edit Car";
 }
 
-<div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
-    <span>@((Model.Id == Guid.Empty) ? "Add" : "Edit") Car: </span>
-</div>
-<div class="w-screen h-screen flex justify-center items-center overflow-y-auto">
-    <form asp-action='@((Model.Id == Guid.Empty) ? "Add" : "Edit")' method="post" class="bg-[#1e1e1e] flex flex-col gap-4 shadow-lg rounded-xl w-full p-6 max-w-[400px] overflow-y-auto">
-        <input type="hidden" asp-for="Id" />
-        <div class="flex flex-col gap-2">
-            <label asp-for="Name">Name:</label>
-            <input asp-for="Name" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Name"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
-            <span asp-validation-for="Name" class="text-red-500"></span>
-        </div>
-        <div class="flex flex-col gap-2">
-            <label asp-for="Brand">Brand:</label>
-            <input asp-for="Brand" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Brand"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
-            <span asp-validation-for="Brand" class="text-red-500"></span>
-        </div>
-        <div class="flex flex-col gap-2">
-            <label asp-for="Color">Color:</label>
-            <input asp-for="Color" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Color"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
-            <span asp-validation-for="Color" class="text-red-500"></span>
-        </div>
-        <div class="flex flex-col gap-2">
-            <label asp-for="Price">Price:</label>
-            <input asp-for="Price" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Price"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' step="0.01" required>
-            <span asp-validation-for="Price" class="text-red-500"></span>
-        </div>
-        <div class="flex justify-center w-full">
-            <button type="submit" class="bg-[#104152] w-full hover:scale-105 transition-all duration-300 p-3 mt-2 font-bold rounded-md">@((Model.Id == Guid.Empty) ? "Add" : "Edit") Car</button>
-        </div>
-    </form>
+@await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+    <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+        <span>@((Model.Id == Guid.Empty) ? "Add" : "Edit") Car: </span>
+    </div>
+    <div class="flex w-full justify-center items-center">
+        <form asp-action='@((Model.Id == Guid.Empty) ? "Add" : "Edit")' method="post" class="bg-[#1e1e1e] flex flex-col gap-4 shadow-lg rounded-xl w-full p-6 max-w-[400px] overflow-y-auto">
+            <input type="hidden" asp-for="Id" />
+            <div class="flex flex-col gap-2">
+                <label asp-for="Name">Name:</label>
+                <input asp-for="Name" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Name"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
+                <span asp-validation-for="Name" class="text-red-500"></span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label asp-for="Brand">Brand:</label>
+                <input asp-for="Brand" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Brand"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
+                <span asp-validation-for="Brand" class="text-red-500"></span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label asp-for="Color">Color:</label>
+                <input asp-for="Color" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Color"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' required>
+                <span asp-validation-for="Color" class="text-red-500"></span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label asp-for="Price">Price:</label>
+                <input asp-for="Price" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Price"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' step="0.01" required>
+                <span asp-validation-for="Price" class="text-red-500"></span>
+            </div>
+            <div class="flex justify-center w-full">
+                <button type="submit" class="bg-[#104152] w-full hover:scale-105 transition-all duration-300 p-3 mt-2 font-bold rounded-md">@((Model.Id == Guid.Empty) ? "Add" : "Edit") Car</button>
+            </div>
+        </form>
+    </div>
 </div>

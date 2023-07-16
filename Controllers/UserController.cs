@@ -58,6 +58,13 @@ namespace Coba_Net.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("session");
+            return RedirectToAction("Login", "User");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
