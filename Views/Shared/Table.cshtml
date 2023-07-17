@@ -1,0 +1,27 @@
+<table class="w-full">
+    <thead>
+        <tr>
+            @foreach (var header in Model.Headers)
+            {
+                <th class="p-3 text-lg">@header</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in Model.List)
+        {
+            <tr>
+                @foreach (var key in Model.Keys)
+                {
+                    var value = data.GetType().GetProperty(key)?.GetValue(data);
+                    <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@value</td>
+                }
+                @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new {
+                    UpdatePath = Model.UpdatePath,
+                    DeletePath = Model.DeletePath,
+                    IdData = data.Id
+                })
+            </tr>
+        }
+    </tbody>
+</table>

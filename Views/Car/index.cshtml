@@ -2,6 +2,26 @@
 @{
     ViewData["Title"] = "Car List";
     var headers = new[] { "Name", "Brand", "Color", "Price", "Action" };
+    var keys = new[] { "Name", "Brand", "Color", "Price" };
+    var tableProps = new {
+        Headers = headers,
+        Keys = keys,
+        List = Model.Cars,
+        UpdatePath = "/Car/Edit",
+        DeletePath = "/Car/Delete"
+    };
+    var searchBarProps = new {
+        SearchValue = Model.Pagination.Search,
+        SearchPath = "/Car/Index",
+        ButtonPath = "/Car/Add",
+        ButtonLabel = "Add Car",
+        DownloadPath = "/Car/Download"
+    };
+    var paginationProps = new {
+        Pagination = Model.Pagination,
+        Path = "/Car/Index",
+        Count = Model.Cars.Count
+    };
 }
 
 @await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
@@ -10,50 +30,14 @@
         <span>Car List:</span>
     </div>
 
-    @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", new {
-        SearchValue = Model.Pagination.Search,
-        SearchPath = "/Car/Index",
-        ButtonPath = "/Car/Add",
-        ButtonLabel = "Add Car",
-        DownloadPath = "/Car/Download"
-    })
+    @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
 
     <div class="px-10 w-full">
         <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full">
             @if (Model.Cars.Count > 0)
             {
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            @foreach (var header in headers)
-                            {
-                                <th class="p-3 text-lg">@header</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var car in Model.Cars)
-                        {
-                            var cars = new[] { car.Name, car.Brand, car.Color, car.Price.ToString() };
-                            <tr>
-                                @foreach (var body in cars)
-                                {
-                                    <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@body</td>
-                                }
-                                @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new {
-                                    UpdatePath = "/Car/Edit",
-                                    DeletePath = "/Car/Delete",
-                                    IdData = car.Id
-                                })
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @await Html.PartialAsync("~/Views/Shared/Pagination.cshtml", new {
-                    Pagination = Model.Pagination,
-                    Path = "/Car/Index",
-                    Count = Model.Cars.Count
-                });
+                @await Html.PartialAsync("~/Views/Shared/Table.cshtml", tableProps);
+                @await Html.PartialAsync("~/Views/Shared/Pagination.cshtml", paginationProps);
             }
             else
             {
