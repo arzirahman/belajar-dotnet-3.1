@@ -25,5 +25,7 @@ namespace Coba_Net.Models
         [Required(ErrorMessage = "The car price is required.")]
         [Range(0, float.MaxValue, ErrorMessage = "The car price must be greater than or equal to 0.")]
         public float Price { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

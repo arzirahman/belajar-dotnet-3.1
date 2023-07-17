@@ -40,6 +40,7 @@ namespace Coba_Net.Controllers
                     car.Color.Contains(search)
                 );
             }
+            query = query.OrderByDescending(car => car.CreatedAt);
             var totalCars = query.Count();
             var totalPages = (int) Math.Ceiling((double) totalCars / limit);
             var cars = query.Skip((page - 1) * limit).Take(limit).ToList();
