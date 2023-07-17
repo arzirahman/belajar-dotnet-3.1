@@ -15,20 +15,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    const confirmDelete = document.getElementById("ConfirmDelete");
-    const confirmDeleteContent = document.getElementById("ConfirmDeleteContent");
-    const confirmDeleteId = document.getElementById("ConfirmDeleteId");
-    const confirmDeleteForm = document.getElementById("ConfirmDeleteForm");
-    confirmDeleteContent.addEventListener("click", (e) => { e.stopPropagation() });
-    function ConfirmDeleteToggle(id = '', path = ''){
-        if (confirmDelete.style.display === "none" || !confirmDelete.style.display) {
-            confirmDeleteId.value = id;
-            confirmDeleteForm.action = path;
-            confirmDelete.style.display = "flex";
-        } else {
-            confirmDelete.style.display = "none";
-        }
-    }
-</script>

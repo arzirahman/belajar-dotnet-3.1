@@ -21,6 +21,12 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
+        public void ViewDataInit()
+        {
+            ViewData["Email"] = HttpContext.Items["Email"];
+            ViewData["Name"] = HttpContext.Items["Name"];
+        }
+
         public IActionResult Index(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
@@ -50,8 +56,7 @@ namespace Coba_Net.Controllers
                 Pagination = Pagination,
                 Cars = cars
             };
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewDataInit();
             return View(CarListView);
         }
 
@@ -59,8 +64,7 @@ namespace Coba_Net.Controllers
         public IActionResult Add()
         {
             var car = new Car();
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewDataInit();
             return View(car);
         }
 
@@ -100,8 +104,7 @@ namespace Coba_Net.Controllers
             {
                 return NotFound();
             }
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewDataInit();
             return View("Add", car);
         }
 
@@ -119,8 +122,7 @@ namespace Coba_Net.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewDataInit();
             return View("Add", car);
         }
 

@@ -58,7 +58,7 @@ namespace Coba_Net
 
             var protectedRoutes = new List<string> 
             { 
-               "/", "/Home", "/Home/index", "/Home/Privacy", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit" 
+               "/", "/Home", "/Home/index", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit" 
             };
 
             var unprotectedRoutes = new List<string> { "/User/Login" };

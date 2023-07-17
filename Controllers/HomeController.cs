@@ -18,17 +18,15 @@ namespace Coba_Net.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public void ViewDataInit()
         {
             ViewData["Email"] = HttpContext.Items["Email"];
             ViewData["Name"] = HttpContext.Items["Name"];
-            return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Index()
         {
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewDataInit();
             return View();
         }
 

@@ -3,7 +3,12 @@
 }
 
 @await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
-<div class="text-center flex-1">
-    <h1 class="display-4">Hello World</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+    <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+        <span>Home:</span>
+    </div>
+    <div class="text-center flex-1">
+        <h1 class="display-4">Hello World</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
 </div>
