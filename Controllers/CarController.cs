@@ -5,6 +5,8 @@ using Coba_Net.Models;
 using Coba_Net.Data;
 using System.Linq;
 using System;
+using OfficeOpenXml;
+using System.IO;
 
 namespace Coba_Net.Controllers
 {
@@ -120,6 +122,33 @@ namespace Coba_Net.Controllers
             ViewData["Email"] = HttpContext.Items["Email"];
             ViewData["Name"] = HttpContext.Items["Name"];
             return View("Add", car);
+        }
+
+        [HttpGet]
+        public IActionResult Download()
+        {
+            var cars = _context.Cars.ToList();
+            using (var excelPackage = new ExcelPackage())
+            {
+                var worksheet = excelPackage.Workbook.Worksheets.Add("Car List");
+                var headers = new[] { "Name", "Brand", "Color", "Price" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = headers[i];   
+                }
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    var car = cars[i];
+                    worksheet.Cells[i + 2, 1].Value = car.Name;
+                    worksheet.Cells[i + 2, 2].Value = car.Brand;
+                    worksheet.Cells[i + 2, 3].Value = car.Color;
+                    worksheet.Cells[i + 2, 4].Value = car.Price;
+                }
+                var stream = new MemoryStream();
+                excelPackage.SaveAs(stream);
+                stream.Position = 0;
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "CarList.xlsx");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
