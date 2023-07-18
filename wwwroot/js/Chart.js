@@ -1,7 +1,16 @@
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+}
+
 var lineChart = new Chart("lineChart", {
     type: 'line',
     data: {
-        labels: lineData.map(car => car.name),
+        labels: lineData.map(car => `${formatDate(car.createdAt)} (${car.name})`),
         datasets: [{
             label: 'Data',
             data: lineData.map(car => car.price),
@@ -22,7 +31,7 @@ var lineChart = new Chart("lineChart", {
                 },
                 title: {
                     display: true,
-                    text: 'Car Price',
+                    text: 'Car Price (Rp)',
                     color: 'white'
                 },
             },
@@ -82,7 +91,7 @@ var barChart = new Chart("barChart", {
                 },
                 title: {
                     display: true,
-                    text: 'Car Price',
+                    text: 'Car Price (Rp)',
                     color: 'white'
                 },
             },

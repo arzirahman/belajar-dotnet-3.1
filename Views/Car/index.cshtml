@@ -1,5 +1,7 @@
 @model CarListView
+@using Coba_Net.Utils
 @{
+
     ViewData["Title"] = "Car List";
     var headers = new[] { "Name", "Brand", "Color", "Price", "Action" };
     var keys = new[] { "Name", "Brand", "Color", "Price" };
@@ -8,7 +10,16 @@
         Keys = keys,
         List = Model.Cars,
         UpdatePath = "/Car/Edit",
-        DeletePath = "/Car/Delete"
+        DeletePath = "/Car/Delete",
+        BodyFormatter = (key, value) => {
+            if(key == "Price")
+            {
+                var formatter = new Formatter();
+                return formatter.FormatMoney(value);
+            }
+            else
+                return value;
+        }
     };
     var searchBarProps = new SearchBarProps {
         SearchValue = Model.Pagination.Search,

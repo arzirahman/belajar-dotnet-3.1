@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
 
-namespace Coba_Net.Services
+namespace Coba_Net.Utils
 {
 
     public class Jwt

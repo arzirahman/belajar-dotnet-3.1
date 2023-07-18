@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using Coba_Net.Services;
+using Coba_Net.Utils;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Security.Claims;

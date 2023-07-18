@@ -16,7 +16,9 @@
                 @foreach (var key in Model.Keys)
                 {
                     var value = data.GetType().GetProperty(key)?.GetValue(data);
-                    <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@value</td>
+                    <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">
+                        @(Model?.BodyFormatter != null ? @Model.BodyFormatter(key, value.ToString()) : value)
+                    </td>
                 }
                 @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new TableActionProps {
                     UpdatePath = Model.UpdatePath,

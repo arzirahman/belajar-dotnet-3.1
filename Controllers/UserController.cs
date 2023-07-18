@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Coba_Net.Models;
 using Coba_Net.Data;
-using Coba_Net.Services;
+using Coba_Net.Utils;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
