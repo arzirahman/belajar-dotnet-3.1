@@ -1,24 +1,37 @@
 @model CarListView
 @using Coba_Net.Utils
+@using Microsoft.AspNetCore.Html
 @{
 
     ViewData["Title"] = "Car List";
-    var headers = new[] { "Name", "Brand", "Color", "Price", "Action" };
-    var keys = new[] { "Name", "Brand", "Color", "Price" };
+    var headers = new[] { "Name", "Price", "Detail", "Action" };
+    var keys = new[] { "Name", "Price", "Detail" };
     var tableProps = new TableProps {
         Headers = headers,
         Keys = keys,
         List = Model.Cars,
         UpdatePath = "/Car/Edit",
         DeletePath = "/Car/Delete",
-        BodyFormatter = (key, value) => {
+        BodyFormatter = (key, dictionary) => {
             if(key == "Price")
             {
                 var formatter = new Formatter();
-                return formatter.FormatMoney(value);
+                var value = dictionary[key].ToString();
+                return new HtmlString($"<div>{formatter.FormatMoney(value)}</div>");
+            }
+            else if(key == "Detail")
+            {
+                var name = dictionary["Name"];
+                var brand = dictionary["Brand"];
+                var color = dictionary["Color"];
+                var price = dictionary["Price"];
+                return new HtmlString($"<button class=\"rounded-md bg-[#116D6E] p-2 px-4\" onclick=\"viewCarDetail('{name}','{brand}','{color}','{price}')\">Detail</button>");
             }
             else
-                return value;
+            {
+                var value = dictionary[key].ToString();
+                return new HtmlString($"<div>{value}</div>");
+            }
         }
     };
     var searchBarProps = new SearchBarProps {
@@ -57,3 +70,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    function viewCarDetail(Name, Brand, Color, Price){
+        const data = { Name, Brand, Color, Price: formatMoney(Price) };
+        let content = '';
+        Object.keys(data).forEach((key) => {
+            content += `
+                <div class="flex gap-2">
+                    <div>${key}</div>
+                    <div>:</div>
+                    <div>${data[key]}</div>
+                </div>`
+            ;
+        })
+        content = `
+            <div class="flex flex-col gap-4">${content}</div>
+        `;
+        modalDetailToggle(content);
+    }
+</script>

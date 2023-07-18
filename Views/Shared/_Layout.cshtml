@@ -8,9 +8,11 @@
 <body>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/Formatter.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("~/Views/Shared/ConfirmDelete.cshtml")
+    @await Html.PartialAsync("~/Views/Shared/ModalDetail.cshtml")
     <div class="w-screen h-screen flex bg-[#0F0E0E] text-white">
         @RenderBody()
     </div>
-    @await Html.PartialAsync("~/Views/Shared/ConfirmDelete.cshtml")
 </body>
 </html>

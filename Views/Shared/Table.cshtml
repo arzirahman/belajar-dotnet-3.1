@@ -1,4 +1,5 @@
 @model TableProps
+@using Coba_Net.Utils
 
 <table class="w-full">
     <thead>
@@ -15,9 +16,10 @@
             <tr>
                 @foreach (var key in Model.Keys)
                 {
-                    var value = data.GetType().GetProperty(key)?.GetValue(data);
+                    var formatter = new Formatter();
+                    var dictionary = formatter.ObjectToDictionary(data);
                     <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">
-                        @(Model?.BodyFormatter != null ? @Model.BodyFormatter(key, value.ToString()) : value)
+                        @(Model?.BodyFormatter != null ? @Model.BodyFormatter(key, dictionary) : dictionary[key])
                     </td>
                 }
                 @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new TableActionProps {

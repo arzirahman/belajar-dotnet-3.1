@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using Microsoft.AspNetCore.Html;
 
 namespace Coba_Net.Models
 {
@@ -10,6 +11,6 @@ namespace Coba_Net.Models
         public List<Car> List { set; get; } 
         public string UpdatePath { set; get; } 
         public string DeletePath { set; get; }
-        public Func<string, string, string> BodyFormatter { set; get; }
+        public Func<string, Dictionary<string, object>, IHtmlContent> BodyFormatter { set; get; }
     }
 }
