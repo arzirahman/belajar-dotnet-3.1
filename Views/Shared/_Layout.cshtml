@@ -6,12 +6,11 @@
     <title>@ViewData["Title"]</title>
 </head>
 <body>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="w-screen h-screen flex bg-[#0F0E0E] text-white">
         @RenderBody()
     </div>
     @await Html.PartialAsync("~/Views/Shared/ConfirmDelete.cshtml")
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 </body>
 </html>

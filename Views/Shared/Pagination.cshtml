@@ -1,3 +1,5 @@
+@model PaginationProps
+
 <div class="flex p-4 px-6 w-full justify-between">
     <div>Showing <strong class="text-[#03dac5]">@(1 + " - " + Model.Count)</strong> From <strong class="text-[#03dac5]">@(Model.Pagination.DataCount)</strong> Data</div>
     <div class="flex gap-2 items-center">

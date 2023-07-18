@@ -1,3 +1,5 @@
+@model TableProps
+
 <table class="w-full">
     <thead>
         <tr>
@@ -16,7 +18,7 @@
                     var value = data.GetType().GetProperty(key)?.GetValue(data);
                     <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">@value</td>
                 }
-                @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new {
+                @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new TableActionProps {
                     UpdatePath = Model.UpdatePath,
                     DeletePath = Model.DeletePath,
                     IdData = data.Id

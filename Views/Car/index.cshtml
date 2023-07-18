@@ -3,21 +3,21 @@
     ViewData["Title"] = "Car List";
     var headers = new[] { "Name", "Brand", "Color", "Price", "Action" };
     var keys = new[] { "Name", "Brand", "Color", "Price" };
-    var tableProps = new {
+    var tableProps = new TableProps {
         Headers = headers,
         Keys = keys,
         List = Model.Cars,
         UpdatePath = "/Car/Edit",
         DeletePath = "/Car/Delete"
     };
-    var searchBarProps = new {
+    var searchBarProps = new SearchBarProps {
         SearchValue = Model.Pagination.Search,
         SearchPath = "/Car/Index",
         ButtonPath = "/Car/Add",
         ButtonLabel = "Add Car",
         DownloadPath = "/Car/Download"
     };
-    var paginationProps = new {
+    var paginationProps = new PaginationProps {
         Pagination = Model.Pagination,
         Path = "/Car/Index",
         Count = Model.Cars.Count
