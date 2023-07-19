@@ -1,41 +1,53 @@
 @model User
 @{
     ViewData["Title"] = "Profile";
+    var ppUrlError = ViewData.ModelState["file"]?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var emailError = ViewData.ModelState["Email"]?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var nameError = ViewData.ModelState["Name"]?.Errors?.FirstOrDefault()?.ErrorMessage;
 }
 
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>Profile:</span>
     </div>
-    <div class="px-10 w-full flex flex-col gap-10">
+    <div class="px-10 w-full flex flex-col gap-10 justify-center flex-1 items-center">
         <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
-            <form action="/User/Profile" method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
-                <div class="flex w-full justify-center">
-                    <label for="fileInput" class="cursor-pointer rounded-full">
-                        @if (Model.PpUrl != null)
-                        {
-                            <img id="profileImage" src="@Model.PpUrl" alt="Profile Picture" class="w-[150px] h-[150px] rounded-full object-cover">
-                        } 
-                        else
-                        {
-                            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                            </svg>
-                        }
-                    </label>
+            <form action="/User/Profile" method="post" enctype="multipart/form-data" class="flex gap-6">
+                <div class="flex flex-col gap-6 items-center justify-center">
+                    <div class="px-6">
+                        <label for="fileInput" class="cursor-pointer rounded-full">
+                            @if (Model.PpUrl != null)
+                            {
+                                <img id="profileImage" src="@Model.PpUrl" alt="Profile Picture" class="w-[200px] h-[200px] rounded-full object-cover">
+                            } 
+                            else
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                </svg>
+                            }
+                        </label>
+                    </div>
+                    <input type="file" name="file" id="fileInput" accept=".jpg, .jpeg, .png" class="hidden">
+                    <div class='text-red-500 @(ppUrlError == null ? "hidden" : "")'>@ppUrlError</div>
                 </div>
-                <input type="file" name="file" id="fileInput" accept=".jpg, .jpeg, .png" class="hidden">
-                <div class="flex flex-col gap-2">
-                    <span>Name:</span>
-                    <input type="text" name="name" class="bg-[#4e4f3e] p-2 px-4 rounded-md" value="@Model.Name">
-                </div>
-                @if (ViewData.ModelState["file"] != null && ViewData.ModelState["file"].Errors.Count > 0)
-                {
-                    <div class="text-red-500">@ViewData.ModelState["file"].Errors[0].ErrorMessage</div>
-                }
-                <div class="w-full flex justify-end">
-                    <button type="submit" class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">Save</button>
+                <div class="flex flex-col flex-1 gap-10 justify-between">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-2">
+                            <span>Email:</span>
+                            <input type="text" name="email" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-2 @(emailError == null ? "border-transparent" : "border-red-500")' value="@Model.Email">
+                            <div class='text-red-500 @(emailError == null ? "hidden" : "")'>@emailError</div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <span>Name:</span>
+                            <input type="text" name="name" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-2 @(nameError == null ? "border-transparent" : "border-red-500")' value="@Model.Name">
+                            <div class='text-red-500 @(nameError == null ? "hidden" : "")'>@nameError</div>
+                        </div>
+                    </div>
+                    <div class="w-full flex justify-end">
+                        <button type="submit" class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">Save</button>
+                    </div>
                 </div>
             </form>
         </div>

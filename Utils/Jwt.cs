@@ -30,12 +30,12 @@ namespace Coba_Net.Utils
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim("Email", user.Email),
+                new Claim("Name", user.Name),
             };
             if (!string.IsNullOrEmpty(user.PpUrl))
             {
-                claims.Add(new Claim(ClaimTypes.Uri, user.PpUrl));
+                claims.Add(new Claim("PpUrl", user.PpUrl));
             }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(_secretKey);
@@ -73,15 +73,15 @@ namespace Coba_Net.Utils
                 SecurityToken validatedToken;
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
                 var filterClaims = principal.Claims.Where(claim => 
-                    claim.Type == ClaimTypes.Email || 
-                    claim.Type == ClaimTypes.Name ||
-                    claim.Type == ClaimTypes.Uri
+                    claim.Type != "exp" && 
+                    claim.Type != "iss" &&
+                    claim.Type != "aud"
                 );
                 var user = new User
                 {
-                    Email = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value,
-                    Name = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value,
-                    PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Uri)?.Value
+                    Email = filterClaims.FirstOrDefault(claim => claim.Type == "Email")?.Value,
+                    Name = filterClaims.FirstOrDefault(claim => claim.Type == "Name")?.Value,
+                    PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == "PpUrl")?.Value
                 };
                 return user;
             }

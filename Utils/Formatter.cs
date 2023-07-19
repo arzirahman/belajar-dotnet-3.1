@@ -2,6 +2,7 @@ using System.Globalization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Coba_Net.Utils
 {
@@ -25,6 +26,12 @@ namespace Coba_Net.Utils
                 dictionary[propertyInfo.Name] = propertyInfo.GetValue(obj);
             }
             return dictionary;
+        }
+
+        public bool IsEmailValid(string email)
+        {
+            string pattern = @"^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, pattern);
         }
     }
 }

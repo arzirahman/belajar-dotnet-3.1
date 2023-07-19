@@ -81,44 +81,74 @@ namespace Coba_Net.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Profile(IFormFile file, string name)
+        public async Task<IActionResult> Profile(IFormFile file, string name, string email)
         {
             var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
-            if (file != null && file.Length > 0)
+            var formatter = new Formatter();
+            if (file != null && file.Length > 0 && file.Length >  500 * 1024)
             {
-                if (file.Length >  500 * 1024)
-                {
-                    ModelState.AddModelError("file", "Image size cannot exceed 500 KB.");
-                    ViewDataInit();
-                    return View("Profile", user);
-                }
-                string extension = Path.GetExtension(file.FileName);
-                string fileName = user.Id.ToString() + extension;
-                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "pp");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-                string filePath = Path.Combine(uploadsFolder, fileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fileStream);
-                }
-                user.PpUrl = "/pp/" + fileName;
+                ModelState.AddModelError("file", "Image size cannot exceed 500 KB.");
             }
-            if (!string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
+                ModelState.AddModelError("name", "Name is empty.");
+            }
+            else if (name.Length > 20)
+            {
+                ModelState.AddModelError("name", "Name cannot exceed 20 character.");   
+            }
+            if (string.IsNullOrEmpty(email))
+            {
+                ModelState.AddModelError("email", "Email is empty."); 
+            } 
+            else if (!formatter.IsEmailValid(email))
+            {
+                ModelState.AddModelError("email", "Invalid format.");    
+            }
+            else if (email != user.Email)
+            {
+                var existingUser = _context.User.FirstOrDefault(user => user.Email == email);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("email", "This email is already in use.");
+                }
+            }
+            if (ModelState.IsValid)
+            {
+                if (file != null && file.Length > 0)
+                {
+                    string extension = Path.GetExtension(file.FileName);
+                    string fileName = user.Id.ToString() + extension;
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "pp");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    user.PpUrl = "/pp/" + fileName;
+                }
                 user.Name = name;
+                user.Email = email;
+                _context.SaveChanges();
+                var newToken = _jwt.GenerateToken(user);
+                Response.Cookies.Append("session", newToken, new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+                    HttpOnly = true,
+                    Secure = false
+                });
+                return RedirectToAction("Profile", "User");
             }
-            _context.SaveChanges();
-            var newToken = _jwt.GenerateToken(user);
-            Response.Cookies.Append("session", newToken, new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-                HttpOnly = true,
-                Secure = false
-            });
-            return RedirectToAction("Profile", "User");
+            else{
+                ViewDataInit();
+                user.Email = email;
+                user.Name = name;
+                return View(user);
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
