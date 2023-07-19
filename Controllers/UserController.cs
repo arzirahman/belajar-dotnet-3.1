@@ -31,6 +31,13 @@ namespace Coba_Net.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        private void ViewDataInit()
+        {
+            ViewData["Email"] = HttpContext.Items["Email"];
+            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -69,18 +76,22 @@ namespace Coba_Net.Controllers
         public IActionResult Profile()
         {
             var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
-            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+            ViewDataInit();
             return View(user);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(IFormFile file, string name)
+        public async Task<IActionResult> Profile(IFormFile file, string name)
         {
             var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
             if (file != null && file.Length > 0)
             {
+                if (file.Length >  500 * 1024)
+                {
+                    ModelState.AddModelError("file", "Image size cannot exceed 500 KB.");
+                    ViewDataInit();
+                    return View("Profile", user);
+                }
                 string extension = Path.GetExtension(file.FileName);
                 string fileName = user.Id.ToString() + extension;
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "pp");

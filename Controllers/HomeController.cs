@@ -21,7 +21,7 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        public void ViewDataInit()
+        private void ViewDataInit()
         {
             ViewData["Email"] = HttpContext.Items["Email"];
             ViewData["Name"] = HttpContext.Items["Name"];

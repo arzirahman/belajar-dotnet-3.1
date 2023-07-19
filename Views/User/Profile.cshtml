@@ -9,7 +9,7 @@
     </div>
     <div class="px-10 w-full flex flex-col gap-10">
         <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
-            <form action="/User/Edit" method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
+            <form action="/User/Profile" method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
                 <div class="flex w-full justify-center">
                     <label for="fileInput" class="cursor-pointer rounded-full">
                         @if (Model.PpUrl != null)
@@ -30,6 +30,10 @@
                     <span>Name:</span>
                     <input type="text" name="name" class="bg-[#4e4f3e] p-2 px-4 rounded-md" value="@Model.Name">
                 </div>
+                @if (ViewData.ModelState["file"] != null && ViewData.ModelState["file"].Errors.Count > 0)
+                {
+                    <div class="text-red-500">@ViewData.ModelState["file"].Errors[0].ErrorMessage</div>
+                }
                 <div class="w-full flex justify-end">
                     <button type="submit" class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">Save</button>
                 </div>
@@ -37,3 +41,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const profileImage = document.getElementById("profileImage");
+    fileInput.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function() {
+            profileImage.src = reader.result;
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
