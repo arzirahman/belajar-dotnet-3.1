@@ -7,6 +7,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
+using Coba_Net.Models;
+using System.Linq;
 
 namespace Coba_Net.Utils
 {
@@ -24,8 +26,17 @@ namespace Coba_Net.Utils
             _secretKey = Encoding.UTF8.GetBytes(secretKey);
         }
 
-        public string GenerateToken(List<Claim> claims)
+        public string GenerateToken(User user)
         {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Name),
+            };
+            if (!string.IsNullOrEmpty(user.PpUrl))
+            {
+                claims.Add(new Claim(ClaimTypes.Uri, user.PpUrl));
+            }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(_secretKey);
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -42,7 +53,7 @@ namespace Coba_Net.Utils
             return tokenString;
         }
 
-        public ClaimsPrincipal ValidateToken(string token)
+        public User ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -61,7 +72,18 @@ namespace Coba_Net.Utils
 
                 SecurityToken validatedToken;
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-                return principal;
+                var filterClaims = principal.Claims.Where(claim => 
+                    claim.Type == ClaimTypes.Email || 
+                    claim.Type == ClaimTypes.Name ||
+                    claim.Type == ClaimTypes.Uri
+                );
+                var user = new User
+                {
+                    Email = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value,
+                    Name = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value,
+                    PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Uri)?.Value
+                };
+                return user;
             }
             catch (Exception)
             {

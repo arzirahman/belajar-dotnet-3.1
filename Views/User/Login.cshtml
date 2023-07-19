@@ -1,9 +1,11 @@
 @model Login
 @{
     ViewData["Title"] = "Login";
+    Layout = null;
 }
 
-<div class="h-screen w-screen flex justify-center items-center">
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="h-screen w-screen flex bg-[#0F0E0E] text-white justify-center items-center">
     <form action="/User/Login" method="post" class="flex flex-col gap-4 rounded-xl w-full p-6 max-w-[400px]">
         <div class="w-full flex justify-center"><img alt="" src="/logo.png" class="w-[150px]" /></div>
         <div class="flex flex-col gap-2">

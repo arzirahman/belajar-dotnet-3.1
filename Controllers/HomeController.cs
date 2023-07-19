@@ -25,6 +25,7 @@ namespace Coba_Net.Controllers
         {
             ViewData["Email"] = HttpContext.Items["Email"];
             ViewData["Name"] = HttpContext.Items["Name"];
+            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
         }
 
         public IActionResult Index()

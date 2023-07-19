@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Coba_Net.Data;
 using Coba_Net.Middlewares;
+using Coba_Net.Utils;
 
 namespace Coba_Net
 {
@@ -29,6 +30,7 @@ namespace Coba_Net
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
             services.AddTransient<InitDb>();
+            services.AddScoped<Jwt>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +60,8 @@ namespace Coba_Net
 
             var protectedRoutes = new List<string> 
             { 
-               "/", "/Home", "/Home/index", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit" 
+               "/", "/Home", "/Home/index", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit", "/User/Profile",
+               "/User/Edit"
             };
 
             var unprotectedRoutes = new List<string> { "/User/Login" };

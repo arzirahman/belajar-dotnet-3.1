@@ -20,6 +20,8 @@ namespace Coba_Net.Models
         [Required]
         public string Password { get; set; }
 
+        public string PpUrl { get; set; }
+
         public void HashPassword()
         {
             using (SHA256 sha256 = SHA256.Create())

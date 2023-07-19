@@ -3,7 +3,6 @@
     ViewData["Title"] = Model.Id == Guid.Empty ? "Add Car" : "Edit Car";
 }
 
-@await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>@((Model.Id == Guid.Empty) ? "Add" : "Edit") Car: </span>

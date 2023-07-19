@@ -6,42 +6,40 @@ using System;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Coba_Net.Middlewares
 {
     public class Session
     {
         private readonly RequestDelegate _next;
-        private readonly Jwt _jwt;
 
         public Session(RequestDelegate next, IConfiguration configuration)
         {
             _next = next;
-            _jwt = new Jwt(configuration);
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var jwt = context.RequestServices.GetRequiredService<Jwt>();
             var sessionCookie = context.Request.Cookies["session"];
-            var claims = _jwt.ValidateToken(sessionCookie);
-            if (string.IsNullOrEmpty(sessionCookie) || claims == null)
+            var user = jwt.ValidateToken(sessionCookie);
+            if (string.IsNullOrEmpty(sessionCookie) || user == null)
             {
                 context.Response.Redirect("/User/Login");
                 return;
             }
             if (context.Request.Path == "/") context.Response.Redirect("/Home");
-            var filterClaims = claims.Claims.Where(claim => claim.Type == ClaimTypes.Email || claim.Type == ClaimTypes.Name);
-            var token = _jwt.GenerateToken(new List<Claim>(filterClaims));
-            context.Response.Cookies.Append("session", token, new CookieOptions
+            var newToken = jwt.GenerateToken(user);
+            context.Response.Cookies.Append("session", newToken, new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
                 HttpOnly = true,
                 Secure = false
             });
-            var emailClaim = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
-            var nameClaim = filterClaims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
-            context.Items["Email"] = emailClaim;
-            context.Items["Name"] = nameClaim;
+            context.Items["Email"] = user.Email;
+            context.Items["Name"] = user.Name;
+            context.Items["PpUrl"] = user.PpUrl;
             await _next(context);
         }
     }

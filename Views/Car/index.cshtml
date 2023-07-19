@@ -13,10 +13,10 @@
         UpdatePath = "/Car/Edit",
         DeletePath = "/Car/Delete",
         BodyFormatter = (key, dictionary) => {
+            var value = key != "Detail" ? dictionary[key].ToString() : null;
             if(key == "Price")
             {
                 var formatter = new Formatter();
-                var value = dictionary[key].ToString();
                 return new HtmlString($"<div>{formatter.FormatMoney(value)}</div>");
             }
             else if(key == "Detail")
@@ -29,7 +29,6 @@
             }
             else
             {
-                var value = dictionary[key].ToString();
                 return new HtmlString($"<div>{value}</div>");
             }
         }
@@ -48,7 +47,6 @@
     };
 }
 
-@await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml")
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>Car List:</span>

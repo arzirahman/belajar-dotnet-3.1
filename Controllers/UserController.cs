@@ -11,6 +11,8 @@ using Coba_Net.Utils;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Coba_Net.Controllers
 {
@@ -19,12 +21,14 @@ namespace Coba_Net.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly AppDb _context;
         private readonly Jwt _jwt;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserController(ILogger<UserController> logger, AppDb context, IConfiguration configuration)
+        public UserController(IWebHostEnvironment webHostEnvironment, ILogger<UserController> logger, AppDb context, IConfiguration configuration, Jwt jwt)
         {
             _logger = logger;
             _context = context;
-            _jwt = new Jwt(configuration);
+            _jwt = jwt;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -44,12 +48,7 @@ namespace Coba_Net.Controllers
                 };
                 return View(error);
             }
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name)
-            };
-            var token = _jwt.GenerateToken(claims);
+            var token = _jwt.GenerateToken(user);
             Response.Cookies.Append("session", token, new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
@@ -64,6 +63,51 @@ namespace Coba_Net.Controllers
         {
             Response.Cookies.Delete("session");
             return RedirectToAction("Login", "User");
+        }
+
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
+            ViewData["Email"] = HttpContext.Items["Email"];
+            ViewData["Name"] = HttpContext.Items["Name"];
+            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(IFormFile file, string name)
+        {
+            var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
+            if (file != null && file.Length > 0)
+            {
+                string extension = Path.GetExtension(file.FileName);
+                string fileName = user.Id.ToString() + extension;
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "pp");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                string filePath = Path.Combine(uploadsFolder, fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                user.PpUrl = "/pp/" + fileName;
+            }
+            if (!string.IsNullOrEmpty(name))
+            {
+                user.Name = name;
+            }
+            _context.SaveChanges();
+            var newToken = _jwt.GenerateToken(user);
+            Response.Cookies.Append("session", newToken, new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+                HttpOnly = true,
+                Secure = false
+            });
+            return RedirectToAction("Profile", "User");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
