@@ -173,13 +173,9 @@ namespace Coba_Net.Controllers
             {
                 ModelState.AddModelError("file", "Please select a valid file.");
             }
-            else if (
-                file.ContentType != "application/vnd.ms-excel" &&
-                file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
-                file.ContentType != "text/csv"
-            )
+            else if (Path.GetExtension(file.FileName).ToLower() != ".xlsx")
             {
-                ModelState.AddModelError("file", "Please upload a valid .xlsx, .xls, or .csv file.");
+                ModelState.AddModelError("file", "Please upload a valid .xlsx file.");
             }
             if (ModelState.IsValid)
             {
