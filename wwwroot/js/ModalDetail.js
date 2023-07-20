@@ -2,7 +2,6 @@ const modalDetail = document.getElementById("ModalDetail");
 const modalDetailContent = document.getElementById("ModalDetailContent");
 modalDetailContent.addEventListener("click", (e) => { e.stopPropagation() });
 function modalDetailToggle(data){
-    console.log(data);
     if (modalDetail.style.display === "none" || !modalDetail.style.display) {
         modalDetail.style.display = "flex";
         const button = `

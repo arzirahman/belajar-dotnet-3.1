@@ -70,6 +70,10 @@ namespace Coba_Net.Controllers
                     ModelState.AddModelError(key, errorMessage);
                 }
             }
+            if (TempData.TryGetValue("Message", out var message))
+            {
+                ViewData["Message"] = message;
+            }
             return View(CarListView);
         }
 
@@ -88,6 +92,7 @@ namespace Coba_Net.Controllers
             {
                 _context.Cars.Add(car);
                 _context.SaveChanges();
+                TempData["Message"] = "Car added successfully";
                 return RedirectToAction("Index");
             }
             else
@@ -106,6 +111,7 @@ namespace Coba_Net.Controllers
             }
             _context.Cars.Remove(car);
             _context.SaveChanges();
+            TempData["Message"] = "Car deleted successfully";
             return RedirectToAction("Index");
         }
 
@@ -133,6 +139,7 @@ namespace Coba_Net.Controllers
                 }
                 _context.Entry(existingCar).CurrentValues.SetValues(car);
                 _context.SaveChanges();
+                TempData["Message"] = "Car edited successfully";
                 return RedirectToAction("Index");
             }
             ViewDataInit();
@@ -210,6 +217,7 @@ namespace Coba_Net.Controllers
                         }
                     }
                 });
+                TempData["Message"] = "File uploaded successfully";
                 return RedirectToAction("Index");
             }
             var errors = new Dictionary<string, string>();

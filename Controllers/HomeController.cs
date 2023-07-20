@@ -32,7 +32,7 @@ namespace Coba_Net.Controllers
         {
             var query = _context.Cars.AsQueryable();
             var lineChartQuery = query.OrderBy(car => car.CreatedAt);
-            var barChartQuery = query.OrderBy(car => car.Price);
+            var barChartQuery = query.OrderByDescending(car => car.Price);
             var lineData = lineChartQuery.Skip(0).Take(10).ToList();
             var barData = barChartQuery.Skip(0).Take(5).ToList();
             ViewDataInit();

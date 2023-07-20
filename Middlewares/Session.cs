@@ -27,7 +27,6 @@ namespace Coba_Net.Middlewares
             if (string.IsNullOrEmpty(sessionCookie) || user == null)
             {
                 context.Response.Redirect("/User/Login");
-                return;
             }
             if (context.Request.Path == "/") context.Response.Redirect("/Home");
             var newToken = jwt.GenerateToken(user);

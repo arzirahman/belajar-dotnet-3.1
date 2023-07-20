@@ -76,6 +76,10 @@ namespace Coba_Net.Controllers
         {
             var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
             ViewDataInit();
+            if (TempData.TryGetValue("Message", out var message))
+            {
+                ViewData["Message"] = message;
+            }
             return View(user);
         }
 
@@ -112,6 +116,7 @@ namespace Coba_Net.Controllers
                     HttpOnly = true,
                     Secure = false
                 });
+                TempData["Message"] = "Profile edited successfully";
                 return RedirectToAction("Profile", "User");
             }
             else{

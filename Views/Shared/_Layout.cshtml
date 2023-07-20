@@ -36,6 +36,7 @@
     <script src="~/js/Formatter.js" asp-append-version="true"></script>
     @await Html.PartialAsync("~/Views/Shared/ConfirmDelete.cshtml")
     @await Html.PartialAsync("~/Views/Shared/ModalDetail.cshtml")
+    @await Html.PartialAsync("~/Views/Shared/ModalInfo.cshtml")
     <div class="w-screen h-screen flex bg-[#0F0E0E] text-white">
         @await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml", sidebarProps)
         @RenderBody()
