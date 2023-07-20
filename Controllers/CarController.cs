@@ -7,6 +7,10 @@ using System.Linq;
 using System;
 using OfficeOpenXml;
 using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
 
 namespace Coba_Net.Controllers
 {
@@ -59,6 +63,13 @@ namespace Coba_Net.Controllers
                 Cars = cars
             };
             ViewDataInit();
+            if (TempData.TryGetValue("ModelStateError", out var errorMessageObject) && errorMessageObject is Dictionary<string, string> errors)
+            {
+                foreach (var (key, errorMessage) in errors)
+                {
+                    ModelState.AddModelError(key, errorMessage);
+                }
+            }
             return View(CarListView);
         }
 
@@ -153,6 +164,64 @@ namespace Coba_Net.Controllers
                 stream.Position = 0;
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "CarList.xlsx");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
+            if (file == null || file.Length <= 0)
+            {
+                ModelState.AddModelError("file", "Please select a valid file.");
+            }
+            else if (
+                file.ContentType != "application/vnd.ms-excel" &&
+                file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+                file.ContentType != "text/csv"
+            )
+            {
+                ModelState.AddModelError("file", "Please upload a valid .xlsx, .xls, or .csv file.");
+            }
+            if (ModelState.IsValid)
+            {
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(file.OpenReadStream()))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                        if (worksheet.Dimension != null)
+                        {
+                            int rowCount = worksheet.Dimension.Rows;
+                            int colCount = worksheet.Dimension.Columns;
+                            for (int row = 2; row <= rowCount; row++)
+                            {
+                                string name = worksheet.Cells[row, 1].Value?.ToString();
+                                string brand = worksheet.Cells[row, 2].Value?.ToString();
+                                string color = worksheet.Cells[row, 3].Value?.ToString();
+                                float price = float.TryParse(worksheet.Cells[row, 4].Value?.ToString(), out float parsedPrice) ? parsedPrice : 0;
+                                var car = new Car
+                                {
+                                    Name = name,
+                                    Brand = brand,
+                                    Color = color,
+                                    Price = price
+                                };
+                                _context.Add(car);
+                            }
+                            _context.SaveChanges();
+                        }
+                    }
+                });
+                return RedirectToAction("Index");
+            }
+            var errors = new Dictionary<string, string>();
+            foreach (var keyModelStatePair in ModelState)
+            {
+                var key = keyModelStatePair.Key;
+                var error = keyModelStatePair.Value.Errors.FirstOrDefault()?.ErrorMessage;
+                errors[key] = error;
+            }
+            TempData["ModelStateError"] = errors;
+            return RedirectToAction("Index");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

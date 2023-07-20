@@ -3,7 +3,7 @@ using Coba_Net.Data;
 using Coba_Net.Models;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-
+using System.IO;
 
 namespace Coba_Net.Utils
 {
@@ -21,9 +21,18 @@ namespace Coba_Net.Utils
         public bool ValidateProfile(User user, IFormFile file, string name, string email, out Dictionary<string, string> errors)
         {
             errors = new Dictionary<string, string>();
-            if (file != null && file.Length > 0 && file.Length > 500 * 1024)
+            if (file != null)
             {
-                errors["file"] = "Image size cannot exceed 500 KB.";
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (file.Length > 0 && file.Length > 500 * 1024)
+                {
+                    errors["file"] = "Image size cannot exceed 500 KB.";
+                }
+                else if (!allowedExtensions.Contains(fileExtension))
+                {
+                    errors["file"] = "Only .jpg, .jpeg, and .png files are allowed.";
+                }
             }
             if (string.IsNullOrEmpty(name))
             {
