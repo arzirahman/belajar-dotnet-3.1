@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Coba_Net.Models;
 using Coba_Net.Data;
 using Coba_Net.Utils;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
@@ -84,36 +83,8 @@ namespace Coba_Net.Controllers
         public async Task<IActionResult> Profile(IFormFile file, string name, string email)
         {
             var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
-            var formatter = new Formatter();
-            if (file != null && file.Length > 0 && file.Length >  500 * 1024)
-            {
-                ModelState.AddModelError("file", "Image size cannot exceed 500 KB.");
-            }
-            if (string.IsNullOrEmpty(name))
-            {
-                ModelState.AddModelError("name", "Name is empty.");
-            }
-            else if (name.Length > 20)
-            {
-                ModelState.AddModelError("name", "Name cannot exceed 20 character.");   
-            }
-            if (string.IsNullOrEmpty(email))
-            {
-                ModelState.AddModelError("email", "Email is empty."); 
-            } 
-            else if (!formatter.IsEmailValid(email))
-            {
-                ModelState.AddModelError("email", "Invalid format.");    
-            }
-            else if (email != user.Email)
-            {
-                var existingUser = _context.User.FirstOrDefault(user => user.Email == email);
-                if (existingUser != null)
-                {
-                    ModelState.AddModelError("email", "This email is already in use.");
-                }
-            }
-            if (ModelState.IsValid)
+            var validator = new ProfileValidator(_context);
+            if (validator.ValidateProfile(user, file, name, email, out Dictionary<string, string> errors))
             {
                 if (file != null && file.Length > 0)
                 {
@@ -144,6 +115,10 @@ namespace Coba_Net.Controllers
                 return RedirectToAction("Profile", "User");
             }
             else{
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(error.Key, error.Value);
+                }
                 ViewDataInit();
                 user.Email = email;
                 user.Name = name;
