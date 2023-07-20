@@ -14,7 +14,7 @@ namespace Coba_Net.Middlewares
     {
         private readonly RequestDelegate _next;
 
-        public Session(RequestDelegate next, IConfiguration configuration)
+        public Session(RequestDelegate next)
         {
             _next = next;
         }

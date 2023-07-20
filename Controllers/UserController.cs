@@ -22,7 +22,7 @@ namespace Coba_Net.Controllers
         private readonly Jwt _jwt;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserController(IWebHostEnvironment webHostEnvironment, ILogger<UserController> logger, AppDb context, IConfiguration configuration, Jwt jwt)
+        public UserController(IWebHostEnvironment webHostEnvironment, ILogger<UserController> logger, AppDb context, Jwt jwt)
         {
             _logger = logger;
             _context = context;

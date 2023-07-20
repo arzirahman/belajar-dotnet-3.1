@@ -11,7 +11,7 @@ namespace Coba_Net.Middlewares
     {
         private readonly RequestDelegate _next;
 
-        public EmptySession(RequestDelegate next, IConfiguration configuration)
+        public EmptySession(RequestDelegate next)
         {
             _next = next;
         }
