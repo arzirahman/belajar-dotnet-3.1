@@ -53,8 +53,6 @@
         <span>Car List:</span>
     </div>
 
-    @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
-
     <form action="/Car/Upload" method="post" enctype="multipart/form-data" class="w-full px-10 flex flex-col gap-4">
         <div class="flex gap-4">
             <input type="file" name="file" id="fileInput" accept=".xlsx" class="hidden">
@@ -70,6 +68,8 @@
         </div>
         <span class='@(fileError != null ? "" : "hidden") text-red-500'>@fileError</span>
     </form>
+    
+    @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
 
     <div class="px-10 w-full">
         <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full">

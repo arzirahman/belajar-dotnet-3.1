@@ -194,14 +194,17 @@ namespace Coba_Net.Controllers
                                 string brand = worksheet.Cells[row, 2].Value?.ToString();
                                 string color = worksheet.Cells[row, 3].Value?.ToString();
                                 float price = float.TryParse(worksheet.Cells[row, 4].Value?.ToString(), out float parsedPrice) ? parsedPrice : 0;
-                                var car = new Car
+                                if (name != null && brand != null && color != null)
                                 {
-                                    Name = name,
-                                    Brand = brand,
-                                    Color = color,
-                                    Price = price
-                                };
-                                _context.Add(car);
+                                    var car = new Car
+                                    {
+                                        Name = name,
+                                        Brand = brand,
+                                        Color = color,
+                                        Price = price
+                                    };
+                                    _context.Add(car);
+                                }
                             }
                             _context.SaveChanges();
                         }
