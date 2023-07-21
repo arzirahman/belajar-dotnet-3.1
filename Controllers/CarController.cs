@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Coba_Net.Utils;
 
 namespace Coba_Net.Controllers
 {
@@ -18,22 +20,34 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<CarController> _logger;
         private readonly AppDb _context;
+        private readonly Jwt _jwt;
 
-        public CarController(ILogger<CarController> logger, AppDb context)
+        public CarController(ILogger<CarController> logger, AppDb context, Jwt jwt)
         {
             _logger = logger;
             _context = context;
+            _jwt = jwt;
         }
 
-        private void ViewDataInit()
+        private bool ValidateToken()
         {
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
-            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+            var userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
+            if (userInfo == null){
+                return false;
+            }
+            else{
+                ViewData["Email"] = userInfo.Email;
+                ViewData["Name"] = userInfo.Name;
+                ViewData["PpUrl"] = userInfo.PpUrl;
+                ViewData["Role"] = userInfo.Role;
+                return true;
+            }
         }
 
+        [Authorize(Roles = "admin")]
         public IActionResult Index(int page = 1, int limit = 5, string search = "")
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
             var query = _context.Cars.AsQueryable();
@@ -62,7 +76,6 @@ namespace Coba_Net.Controllers
                 Pagination = Pagination,
                 Cars = cars
             };
-            ViewDataInit();
             if (TempData.TryGetValue("ModelStateError", out var errorMessageObject) && errorMessageObject is Dictionary<string, string> errors)
             {
                 foreach (var (key, errorMessage) in errors)
@@ -77,14 +90,16 @@ namespace Coba_Net.Controllers
             return View(CarListView);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult Add()
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             var car = new Car();
-            ViewDataInit();
             return View(car);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public IActionResult Add(Car car)
         {
@@ -101,6 +116,7 @@ namespace Coba_Net.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public IActionResult Delete(Guid id)
         {
@@ -115,21 +131,24 @@ namespace Coba_Net.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult Edit(Guid Id)
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             var car = _context.Cars.Find(Id);
             if (car == null)
             {
                 return NotFound();
             }
-            ViewDataInit();
             return View("Add", car);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public IActionResult Edit(Car car)
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             if (ModelState.IsValid)
             {
                 Car existingCar = _context.Cars.Find(car.Id);
@@ -142,13 +161,14 @@ namespace Coba_Net.Controllers
                 TempData["Message"] = "Car edited successfully";
                 return RedirectToAction("Index");
             }
-            ViewDataInit();
             return View("Add", car);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult Download()
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             var cars = _context.Cars.ToList();
             using (var excelPackage = new ExcelPackage())
             {
@@ -173,9 +193,11 @@ namespace Coba_Net.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             if (file == null || file.Length <= 0)
             {
                 ModelState.AddModelError("file", "Please select a valid file.");

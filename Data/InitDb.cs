@@ -20,8 +20,8 @@ namespace Coba_Net.Data
             {
                 var users = new User[]
                 {
-                    new User { Email = "user1@example.com", Name = "User 1", Password = "password1" },
-                    new User { Email = "user2@example.com", Name = "User 2", Password = "password2" }
+                    new User { Email = "admin@example.com", Name = "Admin", Password = "admin", Role = "admin" },
+                    new User { Email = "user@example.com", Name = "User", Password = "user", Role = "user" }
                 };
                 foreach (var user in users)
                 {

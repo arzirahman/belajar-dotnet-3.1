@@ -9,6 +9,7 @@ using System.Text;
 using System.Collections.Generic;
 using Coba_Net.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Coba_Net.Utils
 {
@@ -26,12 +27,13 @@ namespace Coba_Net.Utils
             _secretKey = Encoding.UTF8.GetBytes(secretKey);
         }
 
-        public string GenerateToken(User user)
+        public ClaimsPrincipal GetClaimsPrincipal(User user)
         {
             var claims = new List<Claim>
             {
                 new Claim("Email", user.Email),
                 new Claim("Name", user.Name),
+                new Claim("Role", user.Role)
             };
             if (!string.IsNullOrEmpty(user.PpUrl))
             {
@@ -40,7 +42,6 @@ namespace Coba_Net.Utils
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(_secretKey);
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var tokenOptions = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
@@ -48,9 +49,14 @@ namespace Coba_Net.Utils
                 expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:ExpirationTime"])),
                 signingCredentials: signingCredentials
             );
-
             var tokenString = tokenHandler.WriteToken(tokenOptions);
-            return tokenString;
+            var cookieClaims = new List<Claim>
+            {
+                new Claim("Jwt", tokenString),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+            var claimsIdentity = new ClaimsIdentity(cookieClaims, "Auth");
+            return new ClaimsPrincipal(claimsIdentity);
         }
 
         public User ValidateToken(string token)
@@ -81,7 +87,8 @@ namespace Coba_Net.Utils
                 {
                     Email = filterClaims.FirstOrDefault(claim => claim.Type == "Email")?.Value,
                     Name = filterClaims.FirstOrDefault(claim => claim.Type == "Name")?.Value,
-                    PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == "PpUrl")?.Value
+                    PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == "PpUrl")?.Value,
+                    Role = filterClaims.FirstOrDefault(claim => claim.Type == "Role")?.Value
                 };
                 return user;
             }

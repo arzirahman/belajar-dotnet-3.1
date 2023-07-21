@@ -10,8 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Coba_Net.Data;
-using Coba_Net.Middlewares;
 using Coba_Net.Utils;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Coba_Net
 {
@@ -28,9 +28,18 @@ namespace Coba_Net
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllersWithViews();
             services.AddTransient<InitDb>();
             services.AddScoped<Jwt>();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "session";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                options.SlidingExpiration = true;
+                options.AccessDeniedPath = "/Home";
+                options.LoginPath = "/User/Login";
+            });
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,25 +67,19 @@ namespace Coba_Net
 
             app.UseRouting();
 
-            var protectedRoutes = new List<string> 
-            { 
-               "/", "/Home", "/Home/index", "/Car", "/Car/Index", "/Car/Add", "/Car/Edit", "/User/Profile",
-               "/User/Edit"
-            };
-
-            var unprotectedRoutes = new List<string> { "/User/Login" };
-
-            app.UseWhen(context => protectedRoutes.Contains(context.Request.Path), builder =>
+            app.Use(async (context, next) =>
             {
-                builder.UseMiddleware<Session>();
-                builder.UseAuthorization();
+                if (context.Request.Path == "/")
+                {
+                    context.Response.Redirect("/Home");
+                    return;
+                }
+                await next();
             });
 
-            app.UseWhen(context => unprotectedRoutes.Contains(context.Request.Path), builder =>
-            {
-                builder.UseMiddleware<EmptySession>();
-                builder.UseAuthorization();
-            });
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

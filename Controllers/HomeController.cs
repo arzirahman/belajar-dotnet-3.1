@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Coba_Net.Models;
 using Coba_Net.Data;
+using Microsoft.AspNetCore.Authorization;
+using Coba_Net.Utils;
 
 namespace Coba_Net.Controllers
 {
@@ -14,28 +16,39 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppDb _context;
+        private readonly Jwt _jwt;
 
-        public HomeController(ILogger<HomeController> logger, AppDb context)
+        public HomeController(ILogger<HomeController> logger, AppDb context, Jwt jwt)
         {
             _logger = logger;
             _context = context;
+            _jwt = jwt;
         }
 
-        private void ViewDataInit()
+        private bool ValidateToken()
         {
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
-            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+            var userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
+            if (userInfo == null){
+                return false;
+            }
+            else{
+                ViewData["Email"] = userInfo.Email;
+                ViewData["Name"] = userInfo.Name;
+                ViewData["PpUrl"] = userInfo.PpUrl;
+                ViewData["Role"] = userInfo.Role;
+                return true;
+            }
         }
 
+        [Authorize]
         public IActionResult Index()
         {
+            if (!ValidateToken()) return Redirect("/User/Login");
             var query = _context.Cars.AsQueryable();
             var lineChartQuery = query.OrderBy(car => car.CreatedAt);
             var barChartQuery = query.OrderByDescending(car => car.Price);
             var lineData = lineChartQuery.Skip(0).Take(10).ToList();
             var barData = barChartQuery.Skip(0).Take(5).ToList();
-            ViewDataInit();
             var chart = new Chart{
                 LineData = lineData,
                 BarData = barData

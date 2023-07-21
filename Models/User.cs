@@ -22,6 +22,9 @@ namespace Coba_Net.Models
 
         public string PpUrl { get; set; }
 
+        [Required]
+        public string Role { get; set; }
+
         public void HashPassword()
         {
             using (SHA256 sha256 = SHA256.Create())

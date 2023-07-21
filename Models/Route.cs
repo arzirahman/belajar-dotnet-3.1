@@ -7,5 +7,6 @@ namespace Coba_Net.Models
         public string Label { set; get; }
         public string Path { set; get; }
         public IHtmlContent Icon { set; get; }
+        public string Role { set; get; }
     }
 }

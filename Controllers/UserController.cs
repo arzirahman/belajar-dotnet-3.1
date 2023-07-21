@@ -12,6 +12,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Coba_Net.Controllers
 {
@@ -30,21 +34,33 @@ namespace Coba_Net.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        private void ViewDataInit()
+        private bool ValidateToken(out User userInfo)
         {
-            ViewData["Email"] = HttpContext.Items["Email"];
-            ViewData["Name"] = HttpContext.Items["Name"];
-            ViewData["PpUrl"] = HttpContext.Items["PpUrl"];
+            userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
+            if (userInfo == null){
+                return false;
+            }
+            else{
+                ViewData["Email"] = userInfo.Email;
+                ViewData["Name"] = userInfo.Name;
+                ViewData["PpUrl"] = userInfo.PpUrl;
+                ViewData["Role"] = userInfo.Role;
+                return true;
+            }
         }
 
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Redirect("/Home");
+            }
             return View(new Login());
         }
 
         [HttpPost]
-        public IActionResult Login(Login login)
+        public async Task<IActionResult> Login(Login login, string ReturnUrl)
         {
             var user = _context.User.FirstOrDefault(u => u.Email == login.Email);
             if (user == null || !user.VerifyPassword(login.Password))
@@ -54,28 +70,24 @@ namespace Coba_Net.Controllers
                 };
                 return View(error);
             }
-            var token = _jwt.GenerateToken(user);
-            Response.Cookies.Append("session", token, new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-                HttpOnly = true,
-                Secure = false
-            });
-            return RedirectToAction("Index", "Home");
+            var claimsIdentity = _jwt.GetClaimsPrincipal(user);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
+            return Redirect("/Home");
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            Response.Cookies.Delete("session");
-            return RedirectToAction("Login", "User");
+            await HttpContext.SignOutAsync();
+            return Redirect("/User/Login");
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult Profile()
         {
-            var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
-            ViewDataInit();
+            if (!ValidateToken(out User userInfo)) return Redirect("/User/Login");
+            var user = _context.User.FirstOrDefault(user => user.Email == userInfo.Email);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -83,10 +95,12 @@ namespace Coba_Net.Controllers
             return View(user);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Profile(IFormFile file, string name, string email)
         {
-            var user = _context.User.FirstOrDefault(user => user.Email == (string) HttpContext.Items["Email"]);
+            if (!ValidateToken(out User userInfo)) return Redirect("/User/Login");
+            var user = _context.User.FirstOrDefault(user => user.Email == (string) userInfo.Email);
             var validator = new ProfileValidator(_context);
             if (validator.ValidateProfile(user, file, name, email, out Dictionary<string, string> errors))
             {
@@ -109,13 +123,8 @@ namespace Coba_Net.Controllers
                 user.Name = name;
                 user.Email = email;
                 _context.SaveChanges();
-                var newToken = _jwt.GenerateToken(user);
-                Response.Cookies.Append("session", newToken, new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-                    HttpOnly = true,
-                    Secure = false
-                });
+                var claimsIdentity = _jwt.GetClaimsPrincipal(user);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
                 TempData["Message"] = "Profile edited successfully";
                 return RedirectToAction("Profile", "User");
             }
@@ -124,7 +133,6 @@ namespace Coba_Net.Controllers
                 {
                     ModelState.AddModelError(error.Key, error.Value);
                 }
-                ViewDataInit();
                 user.Email = email;
                 user.Name = name;
                 return View(user);
