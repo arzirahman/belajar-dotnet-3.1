@@ -19,7 +19,8 @@ namespace Filter
 
         public async void OnActionExecuting(ActionExecutingContext context)
         {
-            var userInfo = _jwt.ValidateToken(context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
+            var jwt = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value;
+            var userInfo = jwt != null ? _jwt.ValidateToken(context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value) : null;
             if (userInfo == null)
             {
                 await context.HttpContext.SignOutAsync();
