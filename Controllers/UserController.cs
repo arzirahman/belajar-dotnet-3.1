@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,13 +8,12 @@ using Coba_Net.Models;
 using Coba_Net.Data;
 using Coba_Net.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Filter;
 
 namespace Coba_Net.Controllers
 {
@@ -32,21 +30,6 @@ namespace Coba_Net.Controllers
             _context = context;
             _jwt = jwt;
             _webHostEnvironment = webHostEnvironment;
-        }
-
-        private bool ValidateToken(out User userInfo)
-        {
-            userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
-            if (userInfo == null){
-                return false;
-            }
-            else{
-                ViewData["Email"] = userInfo.Email;
-                ViewData["Name"] = userInfo.Name;
-                ViewData["PpUrl"] = userInfo.PpUrl;
-                ViewData["Role"] = userInfo.Role;
-                return true;
-            }
         }
 
         [HttpGet]
@@ -83,11 +66,11 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
         public IActionResult Profile()
         {
-            if (!ValidateToken(out User userInfo)) return Redirect("/User/Login");
-            var user = _context.User.FirstOrDefault(user => user.Email == userInfo.Email);
+            var user = _context.User.FirstOrDefault(user => user.Email == ViewData["Email"] as string);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -96,11 +79,11 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public async Task<IActionResult> Profile(IFormFile file, string name, string email)
         {
-            if (!ValidateToken(out User userInfo)) return Redirect("/User/Login");
-            var user = _context.User.FirstOrDefault(user => user.Email == (string) userInfo.Email);
+            var user = _context.User.FirstOrDefault(user => user.Email == ViewData["Email"] as string);
             var validator = new ProfileValidator(_context);
             if (validator.ValidateProfile(user, file, name, email, out Dictionary<string, string> errors))
             {

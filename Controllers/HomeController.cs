@@ -9,6 +9,7 @@ using Coba_Net.Models;
 using Coba_Net.Data;
 using Microsoft.AspNetCore.Authorization;
 using Coba_Net.Utils;
+using Filter;
 
 namespace Coba_Net.Controllers
 {
@@ -25,25 +26,10 @@ namespace Coba_Net.Controllers
             _jwt = jwt;
         }
 
-        private bool ValidateToken()
-        {
-            var userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
-            if (userInfo == null){
-                return false;
-            }
-            else{
-                ViewData["Email"] = userInfo.Email;
-                ViewData["Name"] = userInfo.Name;
-                ViewData["PpUrl"] = userInfo.PpUrl;
-                ViewData["Role"] = userInfo.Role;
-                return true;
-            }
-        }
-
         [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
         public IActionResult Index()
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             var query = _context.Cars.AsQueryable();
             var lineChartQuery = query.OrderBy(car => car.CreatedAt);
             var barChartQuery = query.OrderByDescending(car => car.Price);

@@ -9,10 +9,10 @@ using OfficeOpenXml;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Coba_Net.Utils;
+using Filter;
 
 namespace Coba_Net.Controllers
 {
@@ -45,9 +45,9 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         public IActionResult Index(int page = 1, int limit = 5, string search = "")
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
             var query = _context.Cars.AsQueryable();
@@ -91,15 +91,16 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
         public IActionResult Add()
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             var car = new Car();
             return View(car);
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public IActionResult Add(Car car)
         {
@@ -117,6 +118,7 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public IActionResult Delete(Guid id)
         {
@@ -132,10 +134,10 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
         public IActionResult Edit(Guid Id)
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             var car = _context.Cars.Find(Id);
             if (car == null)
             {
@@ -145,10 +147,10 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public IActionResult Edit(Car car)
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             if (ModelState.IsValid)
             {
                 Car existingCar = _context.Cars.Find(car.Id);
@@ -165,6 +167,7 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
         public IActionResult Download()
         {
@@ -194,6 +197,7 @@ namespace Coba_Net.Controllers
         }
 
         [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
