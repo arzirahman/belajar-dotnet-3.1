@@ -1,0 +1,62 @@
+@model List<Rent>
+@{
+    ViewData["Title"] = "Car Rental";
+    var searchBarProps = new SearchBarProps {
+        SearchValue = "",
+        SearchPath = "/Rent/User",
+        ButtonPath = "/Rent/User/Request",
+        ButtonLabel = "Request for Rental",
+    };
+}
+
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+    <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+        <span>Rental History:</span>
+    </div>
+    @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
+    <div class="px-10 w-full flex flex-col gap-10">
+        @foreach (var rent in Model)
+        {
+            <div class="bg-[#1e1e1e] flex flex-col gap-6 shadow-lg rounded-xl w-full p-6">
+                <div class="w-full border-b-[2px] border-[#810CA8] pb-6 flex justify-between items-center">
+                    <div>@rent.Id.ToString()</div>
+                    <div class='px-4 py-2 rounded-lg border-[2px] border-[#@(rent.GetStatusColor())] text-[#@(rent.GetStatusColor())]'>
+                        @rent.Status.ToString()
+                    </div>
+                </div>
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Renter Name</th>
+                            <th>Renter Email</th>
+                            <th>Car Name</th>
+                            <th>Start</th>
+                            <th>End</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">@rent.User.Name</td>
+                            <td class="text-center">@rent.User.Email</td>
+                            <td class="text-center">@rent.Car.Name</td>
+                            <td class="text-center">@rent.StartDate.ToString("dd MMM yyyy")</td>
+                            <td class="text-center">@rent.EndDate.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="flex gap-4">
+                    <a href="@rent.FormUrl" target="_blank">
+                        <button class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                            Show PDF File
+                        </button>
+                    </a>
+                    <div>
+                        <button class="bg-[#2D4263] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                            View Timeline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

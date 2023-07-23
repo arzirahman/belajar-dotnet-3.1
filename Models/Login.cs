@@ -7,5 +7,7 @@ namespace Coba_Net.Models
         public string Password { get; set; }
 
         public string ErrorMessage { get; set; }
+        
+        public string ReturnUrl { get; set; }
     }
 }

@@ -20,28 +20,11 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<CarController> _logger;
         private readonly AppDb _context;
-        private readonly Jwt _jwt;
 
-        public CarController(ILogger<CarController> logger, AppDb context, Jwt jwt)
+        public CarController(ILogger<CarController> logger, AppDb context)
         {
             _logger = logger;
             _context = context;
-            _jwt = jwt;
-        }
-
-        private bool ValidateToken()
-        {
-            var userInfo = _jwt.ValidateToken(User.Claims.FirstOrDefault(c => c.Type == "Jwt")?.Value);
-            if (userInfo == null){
-                return false;
-            }
-            else{
-                ViewData["Email"] = userInfo.Email;
-                ViewData["Name"] = userInfo.Name;
-                ViewData["PpUrl"] = userInfo.PpUrl;
-                ViewData["Role"] = userInfo.Role;
-                return true;
-            }
         }
 
         [Authorize(Roles = "admin")]
@@ -171,7 +154,6 @@ namespace Coba_Net.Controllers
         [HttpGet]
         public IActionResult Download()
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             var cars = _context.Cars.ToList();
             using (var excelPackage = new ExcelPackage())
             {
@@ -201,7 +183,6 @@ namespace Coba_Net.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (!ValidateToken()) return Redirect("/User/Login");
             if (file == null || file.Length <= 0)
             {
                 ModelState.AddModelError("file", "Please select a valid file.");

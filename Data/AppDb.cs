@@ -11,6 +11,8 @@ namespace Coba_Net.Data
 
         public DbSet<User> User { get; set; }
 
+        public DbSet<Rent> Rents { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();

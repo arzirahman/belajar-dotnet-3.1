@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Filter;
+using System;
 
 namespace Coba_Net.Controllers
 {
@@ -33,17 +34,18 @@ namespace Coba_Net.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string ReturnUrl)
         {
             if (User.Identity.IsAuthenticated)
             {
                 return Redirect("/Home");
             }
+            ViewData["ReturnUrl"] = ReturnUrl;
             return View(new Login());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(Login login, string ReturnUrl)
+        public async Task<IActionResult> Login(Login login)
         {
             var user = _context.User.FirstOrDefault(u => u.Email == login.Email);
             if (user == null || !user.VerifyPassword(login.Password))
@@ -55,7 +57,7 @@ namespace Coba_Net.Controllers
             }
             var claimsIdentity = _jwt.GetClaimsPrincipal(user);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
-            return Redirect("/Home");
+            return Redirect(login.ReturnUrl != null ? login.ReturnUrl : "/Home");
         }
 
         [HttpPost]

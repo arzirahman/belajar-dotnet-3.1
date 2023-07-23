@@ -31,6 +31,7 @@ namespace Coba_Net.Utils
         {
             var claims = new List<Claim>
             {
+                new Claim("Id", user.Id.ToString()),
                 new Claim("Email", user.Email),
                 new Claim("Name", user.Name),
                 new Claim("Role", user.Role)
@@ -85,6 +86,7 @@ namespace Coba_Net.Utils
                 );
                 var user = new User
                 {
+                    Id = Guid.Parse(filterClaims.FirstOrDefault(claim => claim.Type == "Id")?.Value),
                     Email = filterClaims.FirstOrDefault(claim => claim.Type == "Email")?.Value,
                     Name = filterClaims.FirstOrDefault(claim => claim.Type == "Name")?.Value,
                     PpUrl = filterClaims.FirstOrDefault(claim => claim.Type == "PpUrl")?.Value,

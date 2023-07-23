@@ -17,13 +17,11 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppDb _context;
-        private readonly Jwt _jwt;
 
-        public HomeController(ILogger<HomeController> logger, AppDb context, Jwt jwt)
+        public HomeController(ILogger<HomeController> logger, AppDb context)
         {
             _logger = logger;
             _context = context;
-            _jwt = jwt;
         }
 
         [Authorize]
