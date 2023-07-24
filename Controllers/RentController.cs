@@ -25,20 +25,127 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "user")]
+        [Authorize(Roles = "admin")]
         [TypeFilter(typeof(ValidateCookie))]
-        public new IActionResult User()
+        public IActionResult Admin(int page = 1, int limit = 5, string search = "")
         {
-            var rents = _context.Rents
-                .Include(r => r.Car)
-                .Include(r => r.User)
-                .Where(r => r.UserId == Guid.Parse(ViewData["UserId"] as string))
-                .ToList();
+            page = page <= 0 ? 1 : page;
+            limit = limit <= 0 ? 5 : limit;
+            var query = _context.Rents.AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Include(r => r.Car).Include(r => r.User).Where(r =>
+                    r.Id.ToString().Contains(search) ||
+                    r.User.Email.Contains(search) ||
+                    r.User.Name.Contains(search) ||
+                    r.Car.Name.Contains(search)
+                );
+            }
+            else
+            {
+                query = query.Include(r => r.Car).Include(r => r.User);
+            }
+            query = query.OrderBy(r => r.Status);
+            var totalRent = query.Count();
+            var totalPages = (int) Math.Ceiling((double) totalRent / limit);
+            var rents = query.Skip((page - 1) * limit).Take(limit).ToList();
+            var Pagination = new Pagination
+            {
+                Page = page,
+                Limit = limit,
+                TotalPages = totalPages,
+                DataCount = totalRent,
+                Search = search
+            };
+            var RentListView = new RentListView
+            {
+                Pagination = Pagination,
+                Rents = rents
+            };
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
             }
-            return View("User/User", rents);
+            return View("Admin/Admin", RentListView);
+        }
+
+        [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
+        [Route("/Rent/Admin/Approve")]
+        [HttpPost]
+        public IActionResult AdminApproveRequest(Guid id)
+        {
+            var rent = _context.Rents.Find(id);
+            if (rent == null || rent?.Status != RentalStatus.Pending){
+                return NotFound();
+            }
+            rent.Status = RentalStatus.Active;
+            _context.SaveChanges();
+            TempData["Message"] = "Rent approved successfully";
+            return Redirect("/Rent/Admin");
+        }
+
+        [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
+        [Route("/Rent/Admin/Complete")]
+        [HttpPost]
+        public IActionResult AdminCompleteRent(Guid id)
+        {
+            var rent = _context.Rents.Find(id);
+            if (rent == null || rent?.Status != RentalStatus.Active){
+                return NotFound();
+            }
+            rent.Status = RentalStatus.Completed;
+            _context.SaveChanges();
+            TempData["Message"] = "Rent approved successfully";
+            return Redirect("/Rent/Admin");
+        }
+
+        [Authorize(Roles = "user")]
+        [TypeFilter(typeof(ValidateCookie))]
+        public new IActionResult User(int page = 1, int limit = 5, string search = "")
+        {
+            page = page <= 0 ? 1 : page;
+            limit = limit <= 0 ? 5 : limit;
+            var query = _context.Rents.AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Include(r => r.Car).Include(r => r.User).Where(r =>
+                    (r.User.Id == Guid.Parse(ViewData["UserId"] as string)) &&
+                    (
+                        r.Id.ToString().Contains(search) ||
+                        r.User.Email.Contains(search) ||
+                        r.User.Name.Contains(search) ||
+                        r.Car.Name.Contains(search)
+                    )
+                );
+            }
+            else
+            {
+                query = query.Include(r => r.Car).Include(r => r.User);
+            }
+            query = query.OrderBy(r => r.Status);
+            var totalRent = query.Count();
+            var totalPages = (int) Math.Ceiling((double) totalRent / limit);
+            var rents = query.Skip((page - 1) * limit).Take(limit).ToList();
+            var Pagination = new Pagination
+            {
+                Page = page,
+                Limit = limit,
+                TotalPages = totalPages,
+                DataCount = totalRent,
+                Search = search
+            };
+            var RentListView = new RentListView
+            {
+                Pagination = Pagination,
+                Rents = rents
+            };
+            if (TempData.TryGetValue("Message", out var message))
+            {
+                ViewData["Message"] = message;
+            }
+            return View("User/User", RentListView);
         }
 
         [Authorize(Roles = "user")]
@@ -91,6 +198,27 @@ namespace Coba_Net.Controllers
             {
                 return View("User/Request", rent);
             }
+        }
+
+        [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
+        [Route("/Rent/User/Cancel")]
+        [HttpPost]
+        public IActionResult CancelRequest(Guid id)
+        {
+            var rent = _context.Rents.FirstOrDefault(r => r.Id == id 
+                && r.UserId == Guid.Parse(ViewData["UserId"] as string
+            ));
+            if (rent == null){
+                return NotFound();
+            }
+            rent.Status = RentalStatus.Canceled;
+            _context.SaveChanges();
+            TempData["Message"] = "Rent cancelled successfully";
+            if (ViewData["Role"] as string == "admin"){
+                return Redirect("/Rent/Admin");
+            }
+            return Redirect("/Rent/User");
         }
 
         [Authorize]

@@ -1,22 +1,19 @@
 @model RentListView
 @{
-    ViewData["Title"] = "Car Rental";
+    ViewData["Title"] = "Admin - Car Rental";
     var searchBarProps = new SearchBarProps {
         SearchValue = Model.Pagination.Search,
-        SearchPath = "/Rent/User",
-        ButtonPath = "/Rent/User/Request",
-        ButtonLabel = "Request for Rental",
+        SearchPath = "/Rent/Admin"
     };
     var paginationProps = new PaginationProps {
         Pagination = Model.Pagination,
-        Path = "/Rent/User",
+        Path = "/Rent/Admin",
         Count = Model.Rents.Count
     };
 }
-
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
-        <span>Rental History:</span>
+        <span>Rental:</span>
     </div>
     @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
     <div class="px-10 w-full flex flex-col gap-10">
@@ -56,16 +53,23 @@
                                 Show PDF File
                             </button>
                         </a>
-                        <div>
-                            <button class="bg-[#2D4263] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                                View Timeline
-                            </button>
-                        </div>
                     </div>
-                    <div class='@(rent.Status.ToString() != "Pending" ? "hidden" : "")'>
-                        <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/User/Cancel', 'Are you sure you want to cancel this request?')" class="bg-[#D72630] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                            Cancel Request
-                        </button>
+                    <div class="flex gap-4">
+                        @if (rent.Status.ToString() == "Pending")
+                        {
+                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Approve', 'Are you sure you want to approve this request?')" class="bg-[#034f22] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                Approve
+                            </button>
+                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/User/Cancel', 'Are you sure you want to cancel this request?')" class="bg-[#D72630] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                Cancel Request
+                            </button>
+                        }
+                        else if(rent.Status.ToString() == "Active")
+                        {
+                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Complete', 'Are you sure you want to complete this rent?')" class="bg-[#2D4263] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                Complete Rent
+                            </button>
+                        }
                     </div>
                 </div>
             </div>

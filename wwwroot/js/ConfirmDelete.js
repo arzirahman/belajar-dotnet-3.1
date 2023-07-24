@@ -6,9 +6,11 @@ const confirmDelete = document.getElementById("ConfirmDelete");
 const confirmDeleteContent = document.getElementById("ConfirmDeleteContent");
 const confirmDeleteId = document.getElementById("ConfirmDeleteId");
 const confirmDeleteForm = document.getElementById("ConfirmDeleteForm");
+const confirmDeleteMessage = document.getElementById("ConfirmDeleteMessage");
 confirmDeleteContent.addEventListener("click", (e) => { e.stopPropagation() });
-function ConfirmDeleteToggle(id = '', path = ''){
+function ConfirmDeleteToggle(id = '', path = '', message = ''){
     if (confirmDelete.style.display === "none" || !confirmDelete.style.display) {
+        confirmDeleteMessage.innerHTML = message;
         confirmDeleteId.value = id;
         confirmDeleteForm.action = path;
         confirmDelete.style.display = "flex";

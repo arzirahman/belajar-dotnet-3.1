@@ -40,9 +40,9 @@ namespace Coba_Net.Models
         public string GetStatusColor()
         {
             if (Status.ToString() == "Pending") return "FFD700";
-            else if (Status.ToString() == "Active") return "008000";
+            else if (Status.ToString() == "Active") return "54f14c";
             else if (Status.ToString() == "Completed") return "1E90FF";
-            else if (Status.ToString() == "Canceled") return "FF4500";
+            else if (Status.ToString() == "Canceled") return "FE0000";
             else return null;
         }
     }

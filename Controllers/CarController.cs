@@ -181,7 +181,7 @@ namespace Coba_Net.Controllers
         [Authorize(Roles = "admin")]
         [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public IActionResult Upload(IFormFile file)
         {
             if (file == null || file.Length <= 0)
             {
@@ -193,37 +193,34 @@ namespace Coba_Net.Controllers
             }
             if (ModelState.IsValid)
             {
-                await Task.Run(() =>
+                using (var package = new ExcelPackage(file.OpenReadStream()))
                 {
-                    using (var package = new ExcelPackage(file.OpenReadStream()))
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    if (worksheet.Dimension != null)
                     {
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                        if (worksheet.Dimension != null)
+                        int rowCount = worksheet.Dimension.Rows;
+                        int colCount = worksheet.Dimension.Columns;
+                        for (int row = 2; row <= rowCount; row++)
                         {
-                            int rowCount = worksheet.Dimension.Rows;
-                            int colCount = worksheet.Dimension.Columns;
-                            for (int row = 2; row <= rowCount; row++)
+                            string name = worksheet.Cells[row, 1].Value?.ToString();
+                            string brand = worksheet.Cells[row, 2].Value?.ToString();
+                            string color = worksheet.Cells[row, 3].Value?.ToString();
+                            float price = float.TryParse(worksheet.Cells[row, 4].Value?.ToString(), out float parsedPrice) ? parsedPrice : 0;
+                            if (name != null && brand != null && color != null)
                             {
-                                string name = worksheet.Cells[row, 1].Value?.ToString();
-                                string brand = worksheet.Cells[row, 2].Value?.ToString();
-                                string color = worksheet.Cells[row, 3].Value?.ToString();
-                                float price = float.TryParse(worksheet.Cells[row, 4].Value?.ToString(), out float parsedPrice) ? parsedPrice : 0;
-                                if (name != null && brand != null && color != null)
+                                var car = new Car
                                 {
-                                    var car = new Car
-                                    {
-                                        Name = name,
-                                        Brand = brand,
-                                        Color = color,
-                                        Price = price
-                                    };
-                                    _context.Add(car);
-                                }
+                                    Name = name,
+                                    Brand = brand,
+                                    Color = color,
+                                    Price = price
+                                };
+                                _context.Add(car);
                             }
-                            _context.SaveChanges();
                         }
+                        _context.SaveChanges();
                     }
-                });
+                }
                 TempData["Message"] = "File uploaded successfully";
                 return RedirectToAction("Index");
             }
