@@ -16,6 +16,8 @@ using Filter;
 
 namespace Coba_Net.Controllers
 {
+    [Authorize(Roles = "admin")]
+    [TypeFilter(typeof(ValidateCookie))]
     public class CarController : Controller
     {
         private readonly ILogger<CarController> _logger;
@@ -27,8 +29,7 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         public IActionResult Index(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
@@ -73,8 +74,7 @@ namespace Coba_Net.Controllers
             return View(CarListView);
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpGet]
         public IActionResult Add()
         {
@@ -82,8 +82,7 @@ namespace Coba_Net.Controllers
             return View(car);
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpPost]
         public IActionResult Add(Car car)
         {
@@ -100,8 +99,7 @@ namespace Coba_Net.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpPost]
         public IActionResult Delete(Guid id)
         {
@@ -116,8 +114,7 @@ namespace Coba_Net.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpGet]
         public IActionResult Edit(Guid Id)
         {
@@ -129,8 +126,7 @@ namespace Coba_Net.Controllers
             return View("Add", car);
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpPost]
         public IActionResult Edit(Car car)
         {
@@ -149,8 +145,7 @@ namespace Coba_Net.Controllers
             return View("Add", car);
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpGet]
         public IActionResult Download()
         {
@@ -178,8 +173,7 @@ namespace Coba_Net.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
+        
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {

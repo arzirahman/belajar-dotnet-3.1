@@ -4,14 +4,16 @@ using Coba_Net.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Coba_Net.Migrations
 {
     [DbContext(typeof(AppDb))]
-    partial class AppDbModelSnapshot : ModelSnapshot
+    [Migration("20230725051939_FlowControl4")]
+    partial class FlowControl4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,10 +59,10 @@ namespace Coba_Net.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ApprovedTime")
+                    b.Property<DateTime>("ApprovedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CancelledTime")
+                    b.Property<DateTime>("CancelledTime")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("CarId")
@@ -74,9 +76,6 @@ namespace Coba_Net.Migrations
 
                     b.Property<string>("FormUrl")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCancelledByAdmin")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");

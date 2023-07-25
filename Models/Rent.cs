@@ -14,7 +14,6 @@ namespace Coba_Net.Models
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "The rental start date is required.")]
-        [DateNotInPast(ErrorMessage = "The rental start date cannot be in the past.")]
         public DateTime StartDate { get; set; }
 
         [Required(ErrorMessage = "The rental end date is required.")]
@@ -23,6 +22,14 @@ namespace Coba_Net.Models
 
         [Required(ErrorMessage = "The rented car is required.")]
         public Guid CarId { get; set; }
+
+        public DateTime? ApprovedTime { set; get; }
+
+        public DateTime? CancelledTime { set; get; }
+
+        public DateTime CreatedAt { set; get; } = DateTime.Now;
+        
+        public bool IsCancelledByAdmin { set; get; } = false;
 
         [ForeignKey("CarId")]
         public Car Car { get; set; }
@@ -35,26 +42,35 @@ namespace Coba_Net.Models
 
         public string FormUrl { get; set; }
 
-        public RentalStatus Status { get; set; } = RentalStatus.Pending;
+        public string GetStatus()
+        { 
+            if (CancelledTime != null) return "Cancelled";
+            else if (ApprovedTime == null) return "Pending";
+            else if (DateTime.Now < StartDate) return "Approved";
+            else if (DateTime.Now >= StartDate && DateTime.Now <= EndDate) return "Active";
+            else if (DateTime.Now > EndDate) return "Complete";
+            else return "";
+        }
+
+        public string[] GetProgress()
+        {
+            var status = GetStatus();
+            var progress = new string[0];
+            if (status == "Approved") progress = progress.Concat(new string[] { "Approved" }).ToArray();
+            else if (status == "Active") progress = progress.Concat(new string[] { "Approved", "Active" }).ToArray();
+            else if (status == "Complete") progress = progress.Concat(new string[] { "Approved", "Active", "Complete" }).ToArray();
+            return progress;
+        }
 
         public string GetStatusColor()
         {
-            if (Status.ToString() == "Pending") return "FFD700";
-            else if (Status.ToString() == "Active") return "54f14c";
-            else if (Status.ToString() == "Completed") return "1E90FF";
-            else if (Status.ToString() == "Canceled") return "FE0000";
+            var Status = GetStatus();
+            if (Status == "Pending") return "FFDF00";
+            else if (Status == "Approved") return "EE82EE";
+            else if (Status == "Active") return "0000FF";
+            else if (Status == "Complete") return "00FF00";
+            else if (Status == "Cancelled") return "FF0000";
             else return null;
         }
-    }
-
-    public enum RentalStatus
-    {
-        Pending,
-        
-        Active,
-
-        Completed,
-
-        Canceled
     }
 }

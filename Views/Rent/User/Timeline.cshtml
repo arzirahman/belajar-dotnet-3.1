@@ -1,0 +1,93 @@
+@model Rent
+@{
+    ViewData["Title"] = "Rent Timeline";
+}
+
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+    <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+        <span>Rent Timeline:</span>
+    </div>
+    <div class="flex flex-col w-full px-10">
+        <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5]">
+            <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                <span>@Model.CreatedAt.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                <span>@Model.CreatedAt.ToString("dd MMMM yyyy")</span>
+            </div>
+            <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                <span class="text-lg font-bold">Request Started</span>
+                <span>User create a request for rent a car</span>
+            </div>
+        </div>
+        <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5] pt-10">
+            <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                <span>@Model.CreatedAt.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                <span>@Model.CreatedAt.ToString("dd MMMM yyyy")</span>
+            </div>
+            <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                <span class="text-lg font-bold">Waiting Approval</span>
+                <span>Waiting for admin's approval</span>
+            </div>
+        </div>
+    @if (Model.GetStatus() == "Cancelled")
+    {
+        <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5] pt-10">
+            <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                <span>@Model.CancelledTime?.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                <span>@Model.CancelledTime?.ToString("dd MMMM yyyy")</span>
+            </div>
+            <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                <span class="text-lg font-bold">Request Cancelled</span>
+                <span>@(Model.IsCancelledByAdmin ? "Admin" : "User") cancelled the request</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if(Model.GetProgress().Contains("Approved"))
+        {
+            <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5] pt-10">
+                <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                    <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                    <span>@Model.ApprovedTime?.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                    <span>@Model.ApprovedTime?.ToString("dd MMMM yyyy")</span>
+                </div>
+                <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                    <span class="text-lg font-bold">Request Approved</span>
+                    <span>Admin approved the request</span>
+                </div>
+            </div>
+        }
+        if(Model.GetProgress().Contains("Active"))
+        {
+            <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5] pt-10">
+                <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                    <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                    <span>@Model.StartDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                    <span>@Model.StartDate.ToString("dd MMMM yyyy")</span>
+                </div>
+                <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                    <span class="text-lg font-bold">Rental Started</span>
+                    <span>Rental status is active, user can use the car</span>
+                </div>
+            </div>
+        }
+        if(Model.GetProgress().Contains("Complete"))
+        {
+            <div class="flex relative gap-[2px] w-full border-l-[2px] border-[#03dac5] pt-10">
+                <div class="flex flex-col gap-2 h-full p-4 justify-center px-6 bg-[#1e1e1e]">
+                    <div class="w-[16px] border-[4px] border-[#0F0E0E] h-[16px] absolute bg-[#03dac5] rounded-full left-[-9px]"></div>
+                    <span>@Model.StartDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                    <span>@Model.StartDate.ToString("dd MMMM yyyy")</span>
+                </div>
+                <div class="flex flex-col gap-2 h-full flex-1 p-4 px-6 bg-[#1e1e1e]">
+                    <span class="text-lg font-bold">Rental Completed</span>
+                    <span>User return the car</span>
+                </div>
+            </div>
+        }
+    }
+    </div>
+</div>

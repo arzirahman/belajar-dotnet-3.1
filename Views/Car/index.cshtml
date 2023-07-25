@@ -1,6 +1,4 @@
 @model CarListView
-@using Coba_Net.Utils
-@using Microsoft.AspNetCore.Html
 @{
 
     ViewData["Title"] = "Car List";
@@ -13,24 +11,8 @@
         UpdatePath = "/Car/Edit",
         DeletePath = "/Car/Delete",
         BodyFormatter = (key, dictionary) => {
-            var value = key != "Detail" ? dictionary[key].ToString() : null;
-            if(key == "Price")
-            {
-                var formatter = new Formatter();
-                return new HtmlString($"<div>{formatter.FormatMoney(value)}</div>");
-            }
-            else if(key == "Detail")
-            {
-                var name = dictionary["Name"];
-                var brand = dictionary["Brand"];
-                var color = dictionary["Color"];
-                var price = dictionary["Price"];
-                return new HtmlString($"<button class=\"rounded-md bg-[#116D6E] p-2 px-4\" onclick=\"viewCarDetail('{name}','{brand}','{color}','{price}')\">Detail</button>");
-            }
-            else
-            {
-                return new HtmlString($"<div>{value}</div>");
-            }
+            var model = new CarFormatModel{ Key = key, Dictionary = dictionary };
+            return Html.DisplayFor(m => model, "CarFormat");
         }
     };
     var searchBarProps = new SearchBarProps {

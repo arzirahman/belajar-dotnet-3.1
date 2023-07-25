@@ -23,7 +23,7 @@
                 <div class="w-full border-b-[2px] border-[#810CA8] pb-6 flex justify-between items-center">
                     <div>@rent.Id.ToString()</div>
                     <div class='px-4 py-2 rounded-lg border-[2px] border-[#@(rent.GetStatusColor())] text-[#@(rent.GetStatusColor())]'>
-                        @rent.Status.ToString()
+                        @rent.GetStatus()
                     </div>
                 </div>
                 <table class="w-full">
@@ -41,8 +41,18 @@
                             <td class="text-center">@rent.User.Name</td>
                             <td class="text-center">@rent.User.Email</td>
                             <td class="text-center">@rent.Car.Name</td>
-                            <td class="text-center">@rent.StartDate.ToString("dd MMM yyyy")</td>
-                            <td class="text-center">@rent.EndDate.ToString("dd MMM yyyy")</td>
+                            <td class="text-center">
+                                <div class="flex flex-col">
+                                    <span>@rent.StartDate.ToString("dd MMM yyyy")</span>
+                                    <span>@rent.StartDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="flex flex-col">
+                                    <span>@rent.EndDate.ToString("dd MMM yyyy")</span>
+                                    <span>@rent.EndDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -55,19 +65,13 @@
                         </a>
                     </div>
                     <div class="flex gap-4">
-                        @if (rent.Status.ToString() == "Pending")
+                        @if (rent.GetStatus() == "Pending")
                         {
                             <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Approve', 'Are you sure you want to approve this request?')" class="bg-[#034f22] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
                                 Approve
                             </button>
                             <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/User/Cancel', 'Are you sure you want to cancel this request?')" class="bg-[#D72630] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
                                 Cancel Request
-                            </button>
-                        }
-                        else if(rent.Status.ToString() == "Active")
-                        {
-                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Complete', 'Are you sure you want to complete this rent?')" class="bg-[#2D4263] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                                Complete Rent
                             </button>
                         }
                     </div>

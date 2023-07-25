@@ -25,9 +25,7 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
-        public IActionResult Admin(int page = 1, int limit = 5, string search = "")
+        private RentListView rentListView(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
@@ -45,7 +43,10 @@ namespace Coba_Net.Controllers
             {
                 query = query.Include(r => r.Car).Include(r => r.User);
             }
-            query = query.OrderBy(r => r.Status);
+            query = query.OrderByDescending(r => r.CreatedAt);
+            if (ViewData["Role"] as string != "admin"){
+                query = query.Where(r => r.User.Id == Guid.Parse(ViewData["UserId"] as string));
+            }
             var totalRent = query.Count();
             var totalPages = (int) Math.Ceiling((double) totalRent / limit);
             var rents = query.Skip((page - 1) * limit).Take(limit).ToList();
@@ -62,6 +63,14 @@ namespace Coba_Net.Controllers
                 Pagination = Pagination,
                 Rents = rents
             };
+            return RentListView;
+        }
+
+        [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
+        public IActionResult Admin(int page = 1, int limit = 5, string search = "")
+        {
+            var RentListView = rentListView(page, limit, search);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -76,28 +85,14 @@ namespace Coba_Net.Controllers
         public IActionResult AdminApproveRequest(Guid id)
         {
             var rent = _context.Rents.Find(id);
-            if (rent == null || rent?.Status != RentalStatus.Pending){
+            if (rent == null){
                 return NotFound();
             }
-            rent.Status = RentalStatus.Active;
-            _context.SaveChanges();
-            TempData["Message"] = "Rent approved successfully";
-            return Redirect("/Rent/Admin");
-        }
-
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
-        [Route("/Rent/Admin/Complete")]
-        [HttpPost]
-        public IActionResult AdminCompleteRent(Guid id)
-        {
-            var rent = _context.Rents.Find(id);
-            if (rent == null || rent?.Status != RentalStatus.Active){
-                return NotFound();
+            if (rent.GetStatus() == "Pending"){
+                rent.ApprovedTime = DateTime.Now;
+                _context.SaveChanges();
+                TempData["Message"] = "Rent approved successfully";
             }
-            rent.Status = RentalStatus.Completed;
-            _context.SaveChanges();
-            TempData["Message"] = "Rent approved successfully";
             return Redirect("/Rent/Admin");
         }
 
@@ -105,42 +100,7 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         public new IActionResult User(int page = 1, int limit = 5, string search = "")
         {
-            page = page <= 0 ? 1 : page;
-            limit = limit <= 0 ? 5 : limit;
-            var query = _context.Rents.AsQueryable();
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Include(r => r.Car).Include(r => r.User).Where(r =>
-                    (r.User.Id == Guid.Parse(ViewData["UserId"] as string)) &&
-                    (
-                        r.Id.ToString().Contains(search) ||
-                        r.User.Email.Contains(search) ||
-                        r.User.Name.Contains(search) ||
-                        r.Car.Name.Contains(search)
-                    )
-                );
-            }
-            else
-            {
-                query = query.Include(r => r.Car).Include(r => r.User);
-            }
-            query = query.OrderBy(r => r.Status);
-            var totalRent = query.Count();
-            var totalPages = (int) Math.Ceiling((double) totalRent / limit);
-            var rents = query.Skip((page - 1) * limit).Take(limit).ToList();
-            var Pagination = new Pagination
-            {
-                Page = page,
-                Limit = limit,
-                TotalPages = totalPages,
-                DataCount = totalRent,
-                Search = search
-            };
-            var RentListView = new RentListView
-            {
-                Pagination = Pagination,
-                Rents = rents
-            };
+            var RentListView = rentListView(page, limit, search);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -206,19 +166,35 @@ namespace Coba_Net.Controllers
         [HttpPost]
         public IActionResult CancelRequest(Guid id)
         {
-            var rent = _context.Rents.FirstOrDefault(r => r.Id == id 
+            var rent = (ViewData["Role"] as string == "admin") 
+            ? _context.Rents.FirstOrDefault(r => r.Id == id)
+            : _context.Rents.FirstOrDefault(r => r.Id == id 
                 && r.UserId == Guid.Parse(ViewData["UserId"] as string
             ));
             if (rent == null){
                 return NotFound();
             }
-            rent.Status = RentalStatus.Canceled;
-            _context.SaveChanges();
-            TempData["Message"] = "Rent cancelled successfully";
-            if (ViewData["Role"] as string == "admin"){
-                return Redirect("/Rent/Admin");
+            if (rent.GetStatus() == "Pending"){
+                rent.CancelledTime = DateTime.Now;
+                if (ViewData["Role"] as string == "admin") rent.IsCancelledByAdmin = true;
+                _context.SaveChanges();
+                TempData["Message"] = "Rent cancelled successfully";
             }
+            if (ViewData["Role"] as string == "admin") return Redirect("/Rent/Admin");
             return Redirect("/Rent/User");
+        }
+
+        [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
+        [Route("/Rent/User/Timeline")]
+        public IActionResult Timeline(Guid id)
+        {
+            var rent = _context.Rents.Include(r => r.Car).FirstOrDefault(r => r.Id == id);
+            if (rent == null)
+            {
+                return NotFound();
+            }
+            return View("User/Timeline", rent);
         }
 
         [Authorize]
@@ -247,7 +223,6 @@ namespace Coba_Net.Controllers
                 return NotFound();
             }
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Response.Headers.Add("Content-Disposition", $"inline; filename=\"{fileName}\"");
             return File(fileStream, "application/pdf");
         }
 
