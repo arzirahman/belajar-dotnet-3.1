@@ -6,5 +6,6 @@ namespace Coba_Net.Models
     {
         public List<Car> Cars { set; get; }
         public Pagination Pagination { set; get; }
+        public Car SelectedCar { set; get; }
     }
 }

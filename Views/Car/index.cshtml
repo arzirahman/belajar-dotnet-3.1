@@ -36,8 +36,8 @@
     var searchBarProps = new SearchBarProps {
         SearchValue = Model.Pagination.Search,
         SearchPath = "/Car/Index",
-        ButtonPath = "/Car/Add",
-        ButtonLabel = "Add Car",
+        ModalButtonFunc = "openModalForm()",
+        ModalButtonLabel = "Add Car",
         DownloadPath = "/Car/Download"
     };
     var paginationProps = new PaginationProps {
@@ -48,6 +48,7 @@
     var fileError = ViewData.ModelState["file"]?.Errors?.FirstOrDefault()?.ErrorMessage;
 }
 
+@await Html.PartialAsync("~/Views/Car/Add.cshtml", Model.SelectedCar)
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>Car List:</span>

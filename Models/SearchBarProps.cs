@@ -7,5 +7,7 @@ namespace Coba_Net.Models
         public string ButtonPath { set; get; } 
         public string ButtonLabel { set; get; } 
         public string DownloadPath { set; get; } 
+        public string ModalButtonLabel { set; get; }
+        public string ModalButtonFunc { set; get; }
     }
 }

@@ -22,6 +22,14 @@
                 <span class="text-base">@Model.ButtonLabel</span>
             </button>
         </a>
+        <div cldivss='@(Model.ModalButtonFunc == null ? "hidden" : "")'>
+            <button onclick="@Model.ModalButtonFunc" class="bg-[#2D4263] shadow-lg pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="text-base">@Model.ModalButtonLabel</span>
+            </button>
+        </div>
     </div>
     <a href="@Model.DownloadPath" class='@(Model.DownloadPath != null ? "" : "hidden")'>
         <button class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">

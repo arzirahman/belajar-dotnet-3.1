@@ -27,9 +27,7 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
-        public IActionResult Index(int page = 1, int limit = 5, string search = "")
+        private CarListView carListView(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
@@ -57,8 +55,17 @@ namespace Coba_Net.Controllers
             var CarListView = new CarListView
             {
                 Pagination = Pagination,
-                Cars = cars
+                Cars = cars,
+                SelectedCar = new Car()
             };
+            return CarListView;
+        }
+
+        [Authorize(Roles = "admin")]
+        [TypeFilter(typeof(ValidateCookie))]
+        public IActionResult Index(int page = 1, int limit = 5, string search = "")
+        {
+            var CarListView = carListView(page, limit, search);
             if (TempData.TryGetValue("ModelStateError", out var errorMessageObject) && errorMessageObject is Dictionary<string, string> errors)
             {
                 foreach (var (key, errorMessage) in errors)
@@ -75,15 +82,6 @@ namespace Coba_Net.Controllers
 
         [Authorize(Roles = "admin")]
         [TypeFilter(typeof(ValidateCookie))]
-        [HttpGet]
-        public IActionResult Add()
-        {
-            var car = new Car();
-            return View(car);
-        }
-
-        [Authorize(Roles = "admin")]
-        [TypeFilter(typeof(ValidateCookie))]
         [HttpPost]
         public IActionResult Add(Car car)
         {
@@ -94,10 +92,9 @@ namespace Coba_Net.Controllers
                 TempData["Message"] = "Car added successfully";
                 return RedirectToAction("Index");
             }
-            else
-            {
-                return View(car);
-            }
+            var CarListView = carListView();
+            CarListView.SelectedCar = car;
+            return View("index", CarListView);
         }
 
         [Authorize(Roles = "admin")]
@@ -126,7 +123,9 @@ namespace Coba_Net.Controllers
             {
                 return NotFound();
             }
-            return View("Add", car);
+            var CarListView = carListView();
+            CarListView.SelectedCar = car;
+            return View("index", CarListView);
         }
 
         [Authorize(Roles = "admin")]
@@ -146,7 +145,9 @@ namespace Coba_Net.Controllers
                 TempData["Message"] = "Car edited successfully";
                 return RedirectToAction("Index");
             }
-            return View("Add", car);
+            var CarListView = carListView();
+            CarListView.SelectedCar = car;
+            return View("index", CarListView);
         }
 
         [Authorize(Roles = "admin")]
