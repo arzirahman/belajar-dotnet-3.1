@@ -22,6 +22,8 @@ namespace Coba_Net.Models
         [MaxLength(20, ErrorMessage = "The maximum length for the color is 20 characters.")]
         public string Color { get; set; }
 
+        public string PicUrl { set; get; }
+
         [Required(ErrorMessage = "The car price is required.")]
         [Range(0, float.MaxValue, ErrorMessage = "The car price must be greater than or equal to 0.")]
         public float Price { get; set; }

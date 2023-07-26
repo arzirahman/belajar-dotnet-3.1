@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-using Coba_Net.Utils;
 using Filter;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Coba_Net.Controllers
 {
@@ -23,13 +23,14 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<CarController> _logger;
         private readonly AppDb _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public CarController(ILogger<CarController> logger, AppDb context)
+        public CarController(IWebHostEnvironment webHostEnvironment, ILogger<CarController> logger, AppDb context)
         {
             _logger = logger;
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
-
         
         public async Task<IActionResult> Index(int page = 1, int limit = 5, string search = "")
         {
@@ -83,12 +84,52 @@ namespace Coba_Net.Controllers
             return View(car);
         }
 
+        private void FileValidation(IFormFile file)
+        {
+            if (file != null && file.Length > 0){
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (file.Length > 0 && file.Length > 500 * 1024)
+                {
+                    ModelState.AddModelError("file", "Image size cannot exceed 2 MB.");
+                }
+                else if (!allowedExtensions.Contains(fileExtension))
+                {
+                    ModelState.AddModelError("file", "Only .jpg, .jpeg, and .png files are allowed.");
+                }
+            }
+        }
+
+        private async Task<string> UploadFile(IFormFile file, string fileName)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "car");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+            string filePath = Path.Combine(uploadsFolder, fileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+            return "/car/" + fileName;
+        }
         
         [HttpPost]
-        public async Task<IActionResult> Add(Car car)
+        public async Task<IActionResult> Add(Car car, IFormFile file)
         {
+            FileValidation(file);
             if (ModelState.IsValid)
             {
+                if (file != null && file.Length > 0)
+                {
+                    var uuid = Guid.NewGuid();
+                    string extension = Path.GetExtension(file.FileName);
+                    string fileName = uuid.ToString() + extension;
+                    var url = await UploadFile(file, fileName);
+                    car.Id = uuid;
+                    car.PicUrl = "/car/" + fileName;
+                }
                 await _context.Cars.AddAsync(car);
                 await _context.SaveChangesAsync();
                 TempData["Message"] = "Car added successfully";
@@ -108,6 +149,15 @@ namespace Coba_Net.Controllers
             if (car == null)
             {
                 return NotFound();
+            }
+            if (!string.IsNullOrEmpty(car.PicUrl))
+            {
+                var fileName = Path.GetFileName(car.PicUrl);
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "car", fileName);
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
             }
             _context.Cars.Remove(car);
             await _context.SaveChangesAsync();
@@ -129,14 +179,23 @@ namespace Coba_Net.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> Edit(Car car)
+        public async Task<IActionResult> Edit(Car car, IFormFile file)
         {
+            FileValidation(file);
             if (ModelState.IsValid)
             {
                 var existingCar = await _context.Cars.FindAsync(car.Id);
                 if (existingCar == null)
                 {
                     return NotFound();
+                }
+                if (file != null && file.Length > 0)
+                {
+                    var fileName = (existingCar.PicUrl == null)
+                    ? car.Id.ToString() + Path.GetExtension(file.FileName)
+                    : Path.GetFileName(existingCar.PicUrl);
+                    var url = await UploadFile(file, fileName);
+                    car.PicUrl = existingCar.PicUrl ?? url;
                 }
                 _context.Entry(existingCar).CurrentValues.SetValues(car);
                 await _context.SaveChangesAsync();

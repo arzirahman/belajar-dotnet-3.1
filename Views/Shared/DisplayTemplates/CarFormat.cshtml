@@ -7,6 +7,7 @@
     var brand = Model.Dictionary["Brand"];
     var color = Model.Dictionary["Color"];
     var price = Model.Dictionary["Price"];
+    var url = Model.Dictionary["PicUrl"] ?? "";
 }
 
 @if (Model.Key == "Price")
@@ -15,7 +16,7 @@
 }
 else if(Model.Key == "Detail")
 {
-    <button class="rounded-md bg-[#116D6E] p-2 px-4" onclick="viewCarDetail('@name','@brand','@color','@price')">Detail</button>
+    <button class="rounded-md bg-[#116D6E] p-2 px-4" onclick="viewCarDetail('@name','@brand','@color','@price','@url')">Detail</button>
 }
 else
 {
