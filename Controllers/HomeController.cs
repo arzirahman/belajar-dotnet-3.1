@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Coba_Net.Models;
 using Coba_Net.Data;
 using Microsoft.AspNetCore.Authorization;
-using Coba_Net.Utils;
 using Filter;
+using Microsoft.EntityFrameworkCore;
 
 namespace Coba_Net.Controllers
 {
@@ -26,13 +26,13 @@ namespace Coba_Net.Controllers
 
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var query = _context.Cars.AsQueryable();
             var lineChartQuery = query.OrderBy(car => car.CreatedAt);
             var barChartQuery = query.OrderByDescending(car => car.Price);
-            var lineData = lineChartQuery.Skip(0).Take(10).ToList();
-            var barData = barChartQuery.Skip(0).Take(5).ToList();
+            var lineData = await lineChartQuery.Skip(0).Take(10).ToListAsync();
+            var barData = await barChartQuery.Skip(0).Take(5).ToListAsync();
             var chart = new Chart{
                 LineData = lineData,
                 BarData = barData

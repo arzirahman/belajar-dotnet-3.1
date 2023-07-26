@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Filter;
-using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Coba_Net.Controllers
 {
@@ -47,7 +47,7 @@ namespace Coba_Net.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(Login login)
         {
-            var user = _context.User.FirstOrDefault(u => u.Email == login.Email);
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Email == login.Email);
             if (user == null || !user.VerifyPassword(login.Password))
             {
                 var error = new Login{
@@ -70,9 +70,9 @@ namespace Coba_Net.Controllers
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
-            var user = _context.User.FirstOrDefault(user => user.Email == ViewData["Email"] as string);
+            var user = await _context.User.FirstOrDefaultAsync(user => user.Email == ViewData["Email"] as string);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -85,9 +85,10 @@ namespace Coba_Net.Controllers
         [HttpPost]
         public async Task<IActionResult> Profile(IFormFile file, string name, string email)
         {
-            var user = _context.User.FirstOrDefault(user => user.Email == ViewData["Email"] as string);
+            var user = await _context.User.FirstOrDefaultAsync(user => user.Email == ViewData["Email"] as string);
             var validator = new ProfileValidator(_context);
-            if (validator.ValidateProfile(user, file, name, email, out Dictionary<string, string> errors))
+            var (isFormValid, errors) = await validator.ValidateProfile(user, file, name, email);
+            if (isFormValid)
             {
                 if (file != null && file.Length > 0)
                 {
@@ -107,7 +108,7 @@ namespace Coba_Net.Controllers
                 }
                 user.Name = name;
                 user.Email = email;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 var claimsIdentity = _jwt.GetClaimsPrincipal(user);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
                 TempData["Message"] = "Profile edited successfully";

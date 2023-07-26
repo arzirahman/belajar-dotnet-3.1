@@ -4,6 +4,8 @@ using Coba_Net.Models;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Coba_Net.Utils
 {
@@ -18,9 +20,9 @@ namespace Coba_Net.Utils
             _formatter = new Formatter();
         }
 
-        public bool ValidateProfile(User user, IFormFile file, string name, string email, out Dictionary<string, string> errors)
+        public async Task<(bool IsValid, Dictionary<string, string> Errors)> ValidateProfile(User user, IFormFile file, string name, string email)
         {
-            errors = new Dictionary<string, string>();
+            var errors = new Dictionary<string, string>();
             if (file != null)
             {
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -52,18 +54,18 @@ namespace Coba_Net.Utils
             }
             else if (email != user.Email)
             {
-                var existingUser = _context.User.FirstOrDefault(u => u.Email == email);
+                var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
                 if (existingUser != null)
                 {
                     errors["Email"] = "This email is already in use.";
                 }
             }
             if (errors != null && errors.Count > 0){
-                return false;
+                return (false, errors);
             }
             else
             {
-                return true;
+                return (true, null);
             }
         }
     }

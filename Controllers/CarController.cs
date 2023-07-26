@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Coba_Net.Utils;
 using Filter;
+using Microsoft.EntityFrameworkCore;
 
 namespace Coba_Net.Controllers
 {
@@ -30,7 +31,7 @@ namespace Coba_Net.Controllers
         }
 
         
-        public IActionResult Index(int page = 1, int limit = 5, string search = "")
+        public async Task<IActionResult> Index(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
@@ -46,7 +47,7 @@ namespace Coba_Net.Controllers
             query = query.OrderByDescending(car => car.CreatedAt);
             var totalCars = query.Count();
             var totalPages = (int) Math.Ceiling((double) totalCars / limit);
-            var cars = query.Skip((page - 1) * limit).Take(limit).ToList();
+            var cars = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
             var Pagination = new Pagination
             {
                 Page = page,
@@ -84,12 +85,12 @@ namespace Coba_Net.Controllers
 
         
         [HttpPost]
-        public IActionResult Add(Car car)
+        public async Task<IActionResult> Add(Car car)
         {
             if (ModelState.IsValid)
             {
-                _context.Cars.Add(car);
-                _context.SaveChanges();
+                await _context.Cars.AddAsync(car);
+                await _context.SaveChangesAsync();
                 TempData["Message"] = "Car added successfully";
                 return RedirectToAction("Index");
             }
@@ -101,24 +102,24 @@ namespace Coba_Net.Controllers
 
         
         [HttpPost]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var car = _context.Cars.Find(id);
+            var car = await _context.Cars.FindAsync(id);
             if (car == null)
             {
                 return NotFound();
             }
             _context.Cars.Remove(car);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             TempData["Message"] = "Car deleted successfully";
             return RedirectToAction("Index");
         }
 
         
         [HttpGet]
-        public IActionResult Edit(Guid Id)
+        public async Task<IActionResult> Edit(Guid Id)
         {
-            var car = _context.Cars.Find(Id);
+            var car = await _context.Cars.FindAsync(Id);
             if (car == null)
             {
                 return NotFound();
@@ -128,17 +129,17 @@ namespace Coba_Net.Controllers
 
         
         [HttpPost]
-        public IActionResult Edit(Car car)
+        public async Task<IActionResult> Edit(Car car)
         {
             if (ModelState.IsValid)
             {
-                Car existingCar = _context.Cars.Find(car.Id);
+                var existingCar = await _context.Cars.FindAsync(car.Id);
                 if (existingCar == null)
                 {
                     return NotFound();
                 }
                 _context.Entry(existingCar).CurrentValues.SetValues(car);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 TempData["Message"] = "Car edited successfully";
                 return RedirectToAction("Index");
             }
@@ -147,9 +148,9 @@ namespace Coba_Net.Controllers
 
         
         [HttpGet]
-        public IActionResult Download()
+        public async Task<IActionResult> Download()
         {
-            var cars = _context.Cars.ToList();
+            var cars = await _context.Cars.ToListAsync();
             using (var excelPackage = new ExcelPackage())
             {
                 var worksheet = excelPackage.Workbook.Worksheets.Add("Car List");
@@ -175,7 +176,7 @@ namespace Coba_Net.Controllers
 
         
         [HttpPost]
-        public IActionResult Upload(IFormFile file)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
             if (file == null || file.Length <= 0)
             {
@@ -189,6 +190,11 @@ namespace Coba_Net.Controllers
             {
                 using (var package = new ExcelPackage(file.OpenReadStream()))
                 {
+                    using (var stream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(stream);
+                        package.Load(stream);
+                    }
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     if (worksheet.Dimension != null)
                     {
@@ -212,7 +218,7 @@ namespace Coba_Net.Controllers
                                 _context.Add(car);
                             }
                         }
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                     }
                 }
                 TempData["Message"] = "File uploaded successfully";

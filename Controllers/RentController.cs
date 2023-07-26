@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Coba_Net.Controllers
 {
@@ -25,7 +26,7 @@ namespace Coba_Net.Controllers
             _context = context;
         }
 
-        private RentListView rentListView(int page = 1, int limit = 5, string search = "")
+        private async Task<RentListView> rentListView(int page = 1, int limit = 5, string search = "")
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
@@ -47,9 +48,9 @@ namespace Coba_Net.Controllers
             if (ViewData["Role"] as string != "admin"){
                 query = query.Where(r => r.User.Id == Guid.Parse(ViewData["UserId"] as string));
             }
-            var totalRent = query.Count();
+            var totalRent = await query.CountAsync();
             var totalPages = (int) Math.Ceiling((double) totalRent / limit);
-            var rents = query.Skip((page - 1) * limit).Take(limit).ToList();
+            var rents = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
             var Pagination = new Pagination
             {
                 Page = page,
@@ -68,9 +69,9 @@ namespace Coba_Net.Controllers
 
         [Authorize(Roles = "admin")]
         [TypeFilter(typeof(ValidateCookie))]
-        public IActionResult Admin(int page = 1, int limit = 5, string search = "")
+        public async Task<IActionResult> Admin(int page = 1, int limit = 5, string search = "")
         {
-            var RentListView = rentListView(page, limit, search);
+            var RentListView = await rentListView(page, limit, search);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -82,15 +83,15 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         [Route("/Rent/Admin/Approve")]
         [HttpPost]
-        public IActionResult AdminApproveRequest(Guid id)
+        public async Task<IActionResult> AdminApproveRequest(Guid id)
         {
-            var rent = _context.Rents.Find(id);
+            var rent = await _context.Rents.FindAsync(id);
             if (rent == null){
                 return NotFound();
             }
             if (rent.GetStatus() == "Pending"){
                 rent.ApprovedTime = DateTime.Now;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 TempData["Message"] = "Rent approved successfully";
             }
             return Redirect("/Rent/Admin");
@@ -98,9 +99,9 @@ namespace Coba_Net.Controllers
 
         [Authorize(Roles = "user")]
         [TypeFilter(typeof(ValidateCookie))]
-        public new IActionResult User(int page = 1, int limit = 5, string search = "")
+        public new async Task<IActionResult> User(int page = 1, int limit = 5, string search = "")
         {
-            var RentListView = rentListView(page, limit, search);
+            var RentListView = await rentListView(page, limit, search);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -111,9 +112,9 @@ namespace Coba_Net.Controllers
         [Authorize(Roles = "user")]
         [TypeFilter(typeof(ValidateCookie))]
         [Route("Rent/User/Request")]
-        public IActionResult UserRequest()
+        public async Task<IActionResult> UserRequest()
         {
-            List<Car> cars = _context.Cars.ToList();
+            List<Car> cars = await _context.Cars.ToListAsync();
             ViewData["Cars"] = cars;
             return View("User/Request");
         }
@@ -122,9 +123,9 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         [Route("Rent/User/Request")]
         [HttpPost]
-        public IActionResult UserRequestPost(Rent rent, IFormFile PdfFile)
+        public async Task<IActionResult> UserRequestPost(Rent rent, IFormFile PdfFile)
         {
-            List<Car> cars = _context.Cars.ToList();
+            List<Car> cars = await _context.Cars.ToListAsync();
             ViewData["Cars"] = cars;
             if (PdfFile == null) ModelState.AddModelError("PdfFile", "Form file is empty");
             else if (Path.GetExtension(PdfFile.FileName).ToLower() != ".pdf")
@@ -143,14 +144,14 @@ namespace Coba_Net.Controllers
                 string filePath = Path.Combine(uploadsFolderPath, uniqueFileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    PdfFile.CopyTo(stream);
+                    await PdfFile.CopyToAsync(stream);
                 }
                 string baseUrl = Request.Scheme + "://" + Request.Host;
                 rent.UserId = Guid.Parse(ViewData["UserId"] as string);
                 rent.Id = uuid;
                 rent.FormUrl = baseUrl + "/Rent/File/" + uniqueFileName;
-                _context.Rents.Add(rent);
-                _context.SaveChanges();
+                await _context.Rents.AddAsync(rent);
+                await _context.SaveChangesAsync();
                 TempData["Message"] = "Rent requested successfully";
                 return Redirect("/Rent/User");
             }
@@ -164,11 +165,11 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         [Route("/Rent/User/Cancel")]
         [HttpPost]
-        public IActionResult CancelRequest(Guid id)
+        public async Task<IActionResult> CancelRequest(Guid id)
         {
             var rent = (ViewData["Role"] as string == "admin") 
-            ? _context.Rents.FirstOrDefault(r => r.Id == id)
-            : _context.Rents.FirstOrDefault(r => r.Id == id 
+            ? await _context.Rents.FirstOrDefaultAsync(r => r.Id == id)
+            : await _context.Rents.FirstOrDefaultAsync(r => r.Id == id 
                 && r.UserId == Guid.Parse(ViewData["UserId"] as string
             ));
             if (rent == null){
@@ -177,7 +178,7 @@ namespace Coba_Net.Controllers
             if (rent.GetStatus() == "Pending"){
                 rent.CancelledTime = DateTime.Now;
                 if (ViewData["Role"] as string == "admin") rent.IsCancelledByAdmin = true;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 TempData["Message"] = "Rent cancelled successfully";
             }
             if (ViewData["Role"] as string == "admin") return Redirect("/Rent/Admin");
@@ -187,9 +188,9 @@ namespace Coba_Net.Controllers
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
         [Route("/Rent/User/Timeline")]
-        public IActionResult Timeline(Guid id)
+        public async Task<IActionResult> Timeline(Guid id)
         {
-            var rent = _context.Rents.Include(r => r.Car).FirstOrDefault(r => r.Id == id);
+            var rent = await _context.Rents.Include(r => r.Car).FirstOrDefaultAsync(r => r.Id == id);
             if (rent == null)
             {
                 return NotFound();
@@ -201,11 +202,11 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         [HttpGet]
         [Route("/Rent/File/{fileName}")]
-        public IActionResult GetPdfFile(string fileName)
+        public async Task<IActionResult> GetPdfFile(string fileName)
         {
             if (ViewData["Role"] as string != "admin")
             {
-                var rent = _context.Rents.FirstOrDefault(u => u.UserId == Guid.Parse(ViewData["UserId"] as string));
+                var rent = await _context.Rents.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(ViewData["UserId"] as string));
                 if (rent == null) return NotFound();
             }
             if (string.IsNullOrEmpty(fileName))
@@ -223,7 +224,11 @@ namespace Coba_Net.Controllers
                 return NotFound();
             }
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return File(fileStream, "application/pdf");
+            using (var memoryStream = new MemoryStream())
+            {
+                await fileStream.CopyToAsync(memoryStream);
+                return File(memoryStream.ToArray(), "application/pdf");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
