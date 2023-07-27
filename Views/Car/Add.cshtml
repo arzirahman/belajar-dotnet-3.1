@@ -28,7 +28,7 @@
             </div>
             <div class="flex flex-col gap-2">
                 <label asp-for="Price">Price:</label>
-                <input asp-for="Price" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Price"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' step="0.01" required>
+                <input asp-for="Price" class='bg-[#4e4f3e] p-2 px-4 rounded-md border-[2px] @(Html.ViewData.ModelState["Price"]?.Errors.Count > 0 ? "border-red-500" : "border-transparent")' step="1" min="0" required>
                 <span asp-validation-for="Price" class="text-red-500"></span>
             </div>
             <div class="flex flex-col gap-2">

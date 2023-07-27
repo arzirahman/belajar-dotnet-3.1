@@ -9,12 +9,25 @@ const confirmDeleteForm = document.getElementById("ConfirmDeleteForm");
 const confirmDeleteMessage = document.getElementById("ConfirmDeleteMessage");
 confirmDeleteContent.addEventListener("click", (e) => { e.stopPropagation() });
 function ConfirmDeleteToggle(id = '', path = '', message = ''){
-    if (confirmDelete.style.display === "none" || !confirmDelete.style.display) {
+    if (confirmDelete.classList.contains('hidden')) {
         confirmDeleteMessage.innerHTML = message;
         confirmDeleteId.value = id;
         confirmDeleteForm.action = path;
-        confirmDelete.style.display = "flex";
+        confirmDelete.classList.remove('hidden');
+        confirmDelete.classList.add('flex');
+        confirmDelete.classList.add('opacity-0');
+        confirmDeleteContent.classList.add('translate-y-[-100%]')
+        setTimeout(() => {
+            confirmDelete.classList.remove('opacity-0');
+            confirmDeleteContent.classList.remove("translate-y-[-100%]");
+        }, 10)
     } else {
-        confirmDelete.style.display = "none";
+        confirmDeleteContent.classList.add("-translate-y-[100%]");
+        confirmDelete.classList.add('opacity-0');
+        setTimeout(() => {
+            confirmDeleteContent.classList.remove("-translate-y-[100%]");
+            confirmDelete.classList.add('hidden');
+            confirmDelete.classList.remove('flex');
+        }, 300);
     }
 }
