@@ -26,7 +26,43 @@ namespace Coba_Net.Controllers
 
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int limit = 6, string search = "")
+        {
+            page = page <= 0 ? 1 : page;
+            limit = limit <= 0 ? 6 : limit;
+            var query = _context.Cars.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(car =>
+                    car.Name.Contains(search) ||
+                    car.Brand.Contains(search) ||
+                    car.Color.Contains(search) ||
+                    car.Price.ToString().Contains(search)
+                );
+            }
+            query = query.OrderByDescending(car => car.CreatedAt);
+            var totalCars = query.Count();
+            var totalPages = (int) Math.Ceiling((double) totalCars / limit);
+            var cars = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
+            var Pagination = new Pagination
+            {
+                Page = page,
+                Limit = limit,
+                TotalPages = totalPages,
+                DataCount = totalCars,
+                Search = search
+            };
+            var CarListView = new CarListView
+            {
+                Pagination = Pagination,
+                Cars = cars
+            };
+            return View(CarListView);
+        }
+
+        [Authorize]
+        [TypeFilter(typeof(ValidateCookie))]
+        public async Task<IActionResult> Chart()
         {
             var query = _context.Cars.AsQueryable();
             var lineChartQuery = query.OrderBy(car => car.CreatedAt);
@@ -37,7 +73,7 @@ namespace Coba_Net.Controllers
                 LineData = lineData,
                 BarData = barData
             };
-            return View(chart);
+            return View("Chart", chart);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

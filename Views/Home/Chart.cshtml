@@ -1,0 +1,29 @@
+﻿@model Chart
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+    <div class="flex flex-col w-full">
+        <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
+            <span>Home:</span>
+        </div>
+        <div class="flex w-full">
+            <a href="/" class="text-center text-lg font-bold bg-[#222831] hover:bg-[#27496D] p-2 flex-1">Car</a>
+            <a href="/Home/Chart" class="text-center text-lg font-bold bg-[#27496D] p-2 flex-1">Chart</a>
+        </div>
+    </div>
+    <div class="px-10 w-full flex flex-col gap-10">
+        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+    var lineData = @Html.Raw(Json.Serialize(Model.LineData));
+    var barData = @Html.Raw(Json.Serialize(Model.BarData));
+</script>
+<script src="~/js/Chart.js" asp-append-version="true"></script>

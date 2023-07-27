@@ -25,8 +25,9 @@ namespace Coba_Net.Models
         public string PicUrl { set; get; }
 
         [Required(ErrorMessage = "The car price is required.")]
-        [Range(0, float.MaxValue, ErrorMessage = "The car price must be greater than or equal to 0.")]
-        public float Price { get; set; }
+        [Range(0, double.MaxValue, ErrorMessage = "The car price must be greater than or equal to 0.")]
+        [Column(TypeName = "decimal(18, 0)")]
+        public decimal Price { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
