@@ -1,8 +1,6 @@
 @model CarFormatModel
-@using Coba_Net.Utils
 @{
     var value = Model.Key != "Detail" ? Model.Dictionary[Model.Key].ToString() : null;
-    var formatter = new Formatter();
     var name = Model.Dictionary["Name"];
     var brand = Model.Dictionary["Brand"];
     var color = Model.Dictionary["Color"];
@@ -12,7 +10,7 @@
 
 @if (Model.Key == "Price")
 {
-    <div>@formatter.FormatMoney(value)</div>
+    <div>@Html.DisplayFor(m => price, "MoneyFormat")</div>
 }
 else if(Model.Key == "Detail")
 {

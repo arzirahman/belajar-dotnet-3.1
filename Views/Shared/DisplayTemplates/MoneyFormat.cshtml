@@ -1,0 +1,6 @@
+@model decimal
+@using Coba_Net.Utils
+@{
+    var formatter = new Formatter();
+}
+<div>@formatter.FormatMoney(Model.ToString())</div>
