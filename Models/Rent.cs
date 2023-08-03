@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Coba_Net.Utils;
 using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace Coba_Net.Models
 {
@@ -72,5 +72,11 @@ namespace Coba_Net.Models
             else if (Status == "Cancelled") return "FF0000";
             else return null;
         }
+    }
+
+    public class RentListView
+    {
+        public List<Rent> Rents { set; get; }
+        public Pagination Pagination { set; get; }
     }
 }

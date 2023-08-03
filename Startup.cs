@@ -36,7 +36,7 @@ namespace Coba_Net
                 options.Cookie.Name = "session";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
                 options.SlidingExpiration = true;
-                options.AccessDeniedPath = "/Home";
+                options.AccessDeniedPath = "/NotFound.html";
                 options.LoginPath = "/User/Login";
             });
             services.AddControllersWithViews();

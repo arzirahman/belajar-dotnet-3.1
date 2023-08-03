@@ -87,7 +87,7 @@ namespace Coba_Net.Controllers
         {
             var rent = await _context.Rents.FindAsync(id);
             if (rent == null){
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             if (rent.GetStatus() == "Pending"){
                 rent.ApprovedTime = DateTime.Now;
@@ -173,7 +173,7 @@ namespace Coba_Net.Controllers
                 && r.UserId == Guid.Parse(ViewData["UserId"] as string
             ));
             if (rent == null){
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             if (rent.GetStatus() == "Pending"){
                 rent.CancelledTime = DateTime.Now;
@@ -193,7 +193,7 @@ namespace Coba_Net.Controllers
             var rent = await _context.Rents.Include(r => r.Car).FirstOrDefaultAsync(r => r.Id == id);
             if (rent == null)
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             return View("User/Timeline", rent);
         }
@@ -207,21 +207,21 @@ namespace Coba_Net.Controllers
             if (ViewData["Role"] as string != "admin")
             {
                 var rent = await _context.Rents.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(ViewData["UserId"] as string));
-                if (rent == null) return NotFound();
+                if (rent == null) return Redirect("/NotFound.html");
             }
             if (string.IsNullOrEmpty(fileName))
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             string uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
             if (!Directory.Exists(uploadsFolderPath))
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             string filePath = Path.Combine(uploadsFolderPath, fileName);
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             using (var memoryStream = new MemoryStream())

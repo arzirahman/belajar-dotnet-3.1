@@ -148,7 +148,7 @@ namespace Coba_Net.Controllers
             var car = await _context.Cars.FindAsync(id);
             if (car == null)
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             if (!string.IsNullOrEmpty(car.PicUrl))
             {
@@ -172,7 +172,7 @@ namespace Coba_Net.Controllers
             var car = await _context.Cars.FindAsync(Id);
             if (car == null)
             {
-                return NotFound();
+                return Redirect("/NotFound.html");
             }
             return View("Add", car);
         }
@@ -187,7 +187,7 @@ namespace Coba_Net.Controllers
                 var existingCar = await _context.Cars.FindAsync(car.Id);
                 if (existingCar == null)
                 {
-                    return NotFound();
+                    return Redirect("/NotFound.html");
                 }
                 if (file != null && file.Length > 0)
                 {

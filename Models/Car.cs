@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace Coba_Net.Models
 {
@@ -30,5 +31,17 @@ namespace Coba_Net.Models
         public decimal Price { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+
+    public class CarListView
+    {
+        public List<Car> Cars { set; get; }
+        public Pagination Pagination { set; get; }
+    }
+
+    public class CarFormatModel
+    {
+        public string Key { set; get; }
+        public Dictionary<string, object> Dictionary { set; get; }
     }
 }
