@@ -3,7 +3,7 @@
     var currentPath = Context.Request.Path.ToString();
 }
 
-<div class="w-[300px] flex flex-col h-full bg-[#121212]">
+<div id="sidebar" class="w-[300px] md:static transition-all duration-300 h-screen fixed top-0 left-0 flex flex-col sm:h-full bg-[#121212]">
     <div class="w-full py-6 px-4 gap-6 flex flex-col flex-1 items-center">
         <img alt="" class="w-[150px]" src="/logo.png" />
         <div class="flex flex-col gap-4 w-full">
@@ -47,3 +47,12 @@
         </form>
     </div>
 </div>
+<div id="sidebarHidden" class="w-[25px] transition-all duration-300 hidden relative h-full items-center bg-[#121212]">
+    <div id="sidebarBtn" class="absolute text-[#27496D] bg-white rounded-full cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+        </svg>
+    </div>
+</div>
+
+<script src="~/js/Sidebar.js" asp-append-version="true"></script>

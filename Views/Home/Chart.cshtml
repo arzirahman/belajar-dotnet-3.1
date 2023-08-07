@@ -13,12 +13,14 @@
             <a href="/Home/Chart" class="text-center text-lg font-bold bg-[#27496D] p-2 flex-1">Chart</a>
         </div>
     </div>
-    <div class="px-10 w-full flex flex-col gap-10">
-        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
-            <canvas id="barChart"></canvas>
-        </div>
-        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6">
-            <canvas id="lineChart"></canvas>
+    <div class="flex w-full px-10">
+        <div class="w-full flex flex-col gap-10 overflow-x-auto">
+            <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6 min-w-[500px]">
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full p-6 min-w-[500px]">
+                <canvas id="lineChart"></canvas>
+            </div>
         </div>
     </div>
 </div>

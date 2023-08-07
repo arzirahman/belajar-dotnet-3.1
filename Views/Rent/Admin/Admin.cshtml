@@ -11,73 +11,77 @@
         Count = Model.Rents.Count
     };
 }
-<div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
+<div class="flex flex-col gap-10 h-full overflow-y-auto flex-1">
     <div class="flex w-full p-6 px-10 shadow-lg text-2xl font-bold bg-[#202020]">
         <span>Rental:</span>
     </div>
     @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
-    <div class="px-10 w-full flex flex-col gap-10">
+    <div class="px-10 w-full h-full flex flex-col gap-10 overflow-x-auto">
         @foreach (var rent in Model.Rents)
         {
-            <div class="bg-[#1e1e1e] flex flex-col gap-6 shadow-lg rounded-xl w-full p-6">
-                <div class="w-full border-b-[2px] border-[#810CA8] pb-6 flex justify-between items-center">
-                    <div>@rent.Id.ToString()</div>
-                    <div class='px-4 py-2 rounded-lg border-[2px] border-[#@(rent.GetStatusColor())] text-[#@(rent.GetStatusColor())]'>
-                        @rent.GetStatus()
+            <div class="bg-[#1e1e1e] flex shadow-lg rounded-xl w-full p-6">
+                <div class="flex flex-col gap-6 h-full w-full overflow-x-auto overflow-y-hidden">
+                    <div class="w-full border-b-[2px] min-w-[500px] border-[#810CA8] pb-6 flex justify-between items-center">
+                        <div>@rent.Id.ToString()</div>
+                        <div class='px-4 py-2 rounded-lg border-[2px] border-[#@(rent.GetStatusColor())] text-[#@(rent.GetStatusColor())]'>
+                            @rent.GetStatus()
+                        </div>
                     </div>
-                </div>
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            <th>Renter Name</th>
-                            <th>Renter Email</th>
-                            <th>Car Name</th>
-                            <th>Start</th>
-                            <th>End</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-center">@rent.User.Name</td>
-                            <td class="text-center">@rent.User.Email</td>
-                            <td class="text-center">@rent.Car.Name</td>
-                            <td class="text-center">
-                                <div class="flex flex-col">
-                                    <span>@rent.StartDate.ToString("dd MMM yyyy")</span>
-                                    <span>@rent.StartDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="flex flex-col">
-                                    <span>@rent.EndDate.ToString("dd MMM yyyy")</span>
-                                    <span>@rent.EndDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="flex gap-4 w-full justify-between">
-                    <div class="flex gap-4">
-                        <a href="@rent.FormUrl" target="_blank">
-                            <button class="bg-[#116D6E] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                                Show PDF File
-                            </button>
-                        </a>
-                    </div>
-                    <div class="flex gap-4">
-                        @if (rent.GetStatus() == "Pending")
-                        {
-                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Approve', 'Are you sure you want to approve this request?')" class="bg-[#034f22] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                                Approve
-                            </button>
-                            <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/User/Cancel', 'Are you sure you want to cancel this request?')" class="bg-[#D72630] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
-                                Cancel Request
-                            </button>
-                        }
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Renter Name</th>
+                                <th>Renter Email</th>
+                                <th>Car Name</th>
+                                <th>Start</th>
+                                <th>End</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center px-4">@rent.User.Name</td>
+                                <td class="text-center px-4">@rent.User.Email</td>
+                                <td class="text-center px-4">@rent.Car.Name</td>
+                                <td class="text-center px-4">
+                                    <div class="flex flex-col">
+                                        <span>@rent.StartDate.ToString("dd MMM yyyy")</span>
+                                        <span>@rent.StartDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                                    </div>
+                                </td>
+                                <td class="text-center px-4">
+                                    <div class="flex flex-col">
+                                        <span>@rent.EndDate.ToString("dd MMM yyyy")</span>
+                                        <span>@rent.EndDate.TimeOfDay.ToString(@"hh\:mm\:ss")</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="flex gap-4 w-full justify-between">
+                        <div class="flex gap-4">
+                            <a href="@rent.FormUrl" target="_blank">
+                                <button class="bg-[#116D6E] min-w-[170px] justify-center text-center px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                    Show PDF File
+                                </button>
+                            </a>
+                        </div>
+                        <div class="flex gap-4">
+                            @if (rent.GetStatus() == "Pending")
+                            {
+                                <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/Admin/Approve', 'Are you sure you want to approve this request?')" class="bg-[#034f22] px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                    Approve
+                                </button>
+                                <button onclick="ConfirmDeleteToggle('@rent.Id', '/Rent/User/Cancel', 'Are you sure you want to cancel this request?')" class="bg-[#D72630] min-w-[170px] justify-center text-center px-6 text-base shadow-lg flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+                                    Cancel Request
+                                </button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         }
+    </div>
+    <div class="w-full px-10 pb-10">
         <div class="bg-[#1e1e1e] flex shadow-lg rounded-xl w-full">
             @await Html.PartialAsync("~/Views/Shared/Pagination.cshtml", paginationProps)
         </div>

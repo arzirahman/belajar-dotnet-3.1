@@ -55,7 +55,10 @@
 <body>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/Formatter.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @await Html.PartialAsync("~/Views/Shared/ConfirmDelete.cshtml")
     @await Html.PartialAsync("~/Views/Shared/ModalDetail.cshtml")
     @await Html.PartialAsync("~/Views/Shared/ModalInfo.cshtml")
@@ -63,5 +66,15 @@
         @await Html.PartialAsync("~/Views/Shared/Sidebar.cshtml", sidebarProps)
         @RenderBody()
     </div>
+    <script>
+        $(document).ready(function() {
+            $("form").on("submit", function() {
+                $("input").removeClass("border-red-500");
+                if (!$(this).valid()) {
+                    $(this).find(".input-validation-error").addClass("border-red-500");
+                }
+            });
+        });
+    </script>
 </body>
 </html>

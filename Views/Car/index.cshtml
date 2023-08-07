@@ -36,9 +36,9 @@
     </div>
 
     <form action="/Car/Upload" method="post" enctype="multipart/form-data" class="w-full px-10 flex flex-col gap-4">
-        <div class="flex gap-4">
+        <div class="flex gap-4 w-full sm:max-w-[200px]">
             <input type="file" name="file" id="fileInput" accept=".xlsx" class="hidden">
-            <label for="fileInput" class="bg-[#2D4263] justify-center w-[170px] cursor-pointer shadow-lg pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
+            <label for="fileInput" class="bg-[#2D4263] flex-1 justify-center w-[170px] cursor-pointer shadow-lg pr-6 flex items-center gap-2 shadow-lg p-3 hover:scale-105 transition-all duration-300 font-bold text-3xl rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                 </svg>
@@ -54,7 +54,7 @@
     @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
 
     <div class="px-10 w-full">
-        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full">
+        <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full overflow-x-auto">
             @if (Model.Cars.Count > 0)
             {
                 @await Html.PartialAsync("~/Views/Shared/Table.cshtml", tableProps);
