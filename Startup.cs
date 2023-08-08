@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Coba_Net.Data;
 using Coba_Net.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Coba_Net.Services;
 
 namespace Coba_Net
 {
@@ -29,7 +30,12 @@ namespace Coba_Net
         {
             services.AddDbContext<AppDb>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<InitDb>();
+            services.AddHttpContextAccessor();
             services.AddScoped<Jwt>();
+            services.AddScoped<CarService>();
+            services.AddScoped<HomeService>();
+            services.AddScoped<RentService>();
+            services.AddScoped<UserService>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {

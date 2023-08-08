@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Filter;
 using Microsoft.EntityFrameworkCore;
+using Coba_Net.Services;
 
 namespace Coba_Net.Controllers
 {
@@ -22,13 +23,15 @@ namespace Coba_Net.Controllers
         private readonly AppDb _context;
         private readonly Jwt _jwt;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly UserService _service;
 
-        public UserController(IWebHostEnvironment webHostEnvironment, ILogger<UserController> logger, AppDb context, Jwt jwt)
+        public UserController(IWebHostEnvironment webHostEnvironment, ILogger<UserController> logger, AppDb context, Jwt jwt, UserService service)
         {
             _logger = logger;
             _context = context;
             _jwt = jwt;
             _webHostEnvironment = webHostEnvironment;
+            _service = service;
         }
 
         [HttpGet]
@@ -55,7 +58,7 @@ namespace Coba_Net.Controllers
             }
             var claimsIdentity = _jwt.GetClaimsPrincipal(user);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
-            return Redirect(login.ReturnUrl != null ? login.ReturnUrl : "/Home");
+            return Redirect(login.ReturnUrl ?? "/Home");
         }
 
         [HttpPost]
@@ -88,27 +91,7 @@ namespace Coba_Net.Controllers
             var (isFormValid, errors) = await validator.ValidateProfile(user, file, name, email);
             if (isFormValid)
             {
-                if (file != null && file.Length > 0)
-                {
-                    string extension = Path.GetExtension(file.FileName);
-                    string fileName = user.Id.ToString() + extension;
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "pp");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-                    string filePath = Path.Combine(uploadsFolder, fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
-                    user.PpUrl = "/pp/" + fileName;
-                }
-                user.Name = name;
-                user.Email = email;
-                await _context.SaveChangesAsync();
-                var claimsIdentity = _jwt.GetClaimsPrincipal(user);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsIdentity);
+                await _service.Profile(user, file, name, email);
                 TempData["Message"] = "Profile edited successfully";
                 return RedirectToAction("Profile", "User");
             }

@@ -9,53 +9,28 @@ using Coba_Net.Data;
 using Microsoft.AspNetCore.Authorization;
 using Filter;
 using Microsoft.EntityFrameworkCore;
+using Coba_Net.Services;
 
 namespace Coba_Net.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly AppDb _context;
+        private readonly CarService _carService;
+        private readonly HomeService _homeService;
 
-        public HomeController(ILogger<HomeController> logger, AppDb context)
+        public HomeController(ILogger<HomeController> logger, CarService carService, HomeService homeService)
         {
             _logger = logger;
-            _context = context;
+            _carService = carService;
+            _homeService = homeService; 
         }
 
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
         public async Task<IActionResult> Index(int page = 1, int limit = 6, string search = "")
         {
-            page = page <= 0 ? 1 : page;
-            limit = limit <= 0 ? 6 : limit;
-            var query = _context.Cars.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(car =>
-                    car.Name.Contains(search) ||
-                    car.Brand.Contains(search) ||
-                    car.Color.Contains(search) ||
-                    car.Price.ToString().Contains(search)
-                );
-            }
-            query = query.OrderByDescending(car => car.CreatedAt);
-            var totalCars = query.Count();
-            var totalPages = (int) Math.Ceiling((double) totalCars / limit);
-            var cars = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
-            var Pagination = new Pagination
-            {
-                Page = page,
-                Limit = limit,
-                TotalPages = totalPages,
-                DataCount = totalCars,
-                Search = search
-            };
-            var CarListView = new CarListView
-            {
-                Pagination = Pagination,
-                Cars = cars
-            };
+            var CarListView = await _carService.GetCarList(page, limit, search);
             return View(CarListView);
         }
 
@@ -63,15 +38,7 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         public async Task<IActionResult> Chart()
         {
-            var query = _context.Cars.AsQueryable();
-            var lineChartQuery = query.OrderBy(car => car.CreatedAt);
-            var barChartQuery = query.OrderByDescending(car => car.Price);
-            var lineData = await lineChartQuery.Skip(0).Take(10).ToListAsync();
-            var barData = await barChartQuery.Skip(0).Take(5).ToListAsync();
-            var chart = new Chart{
-                LineData = lineData,
-                BarData = barData
-            };
+            var chart = await _homeService.Chart();
             return View("Chart", chart);
         }
 

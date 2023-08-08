@@ -29,7 +29,7 @@ namespace Filter
             }
             else
             {
-                var controller = context.Controller as Controller;
+                var controller = (Controller) context.Controller;
                 if (controller != null)
                 {
                     controller.ViewData["UserId"] = userInfo.Id.ToString();

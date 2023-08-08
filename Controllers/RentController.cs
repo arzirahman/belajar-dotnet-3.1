@@ -5,13 +5,13 @@ using Coba_Net.Models;
 using Coba_Net.Data;
 using Microsoft.AspNetCore.Authorization;
 using Filter;
-using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Coba_Net.Services;
 
 namespace Coba_Net.Controllers
 {
@@ -19,59 +19,20 @@ namespace Coba_Net.Controllers
     {
         private readonly ILogger<RentController> _logger;
         private readonly AppDb _context;
+        private readonly RentService _service;
 
-        public RentController(ILogger<RentController> logger, AppDb context)
+        public RentController(ILogger<RentController> logger, AppDb context, RentService service)
         {
             _logger = logger;
             _context = context;
-        }
-
-        private async Task<RentListView> rentListView(int page = 1, int limit = 5, string search = "")
-        {
-            page = page <= 0 ? 1 : page;
-            limit = limit <= 0 ? 5 : limit;
-            var query = _context.Rents.AsQueryable();
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Include(r => r.Car).Include(r => r.User).Where(r =>
-                    r.Id.ToString().Contains(search) ||
-                    r.User.Email.Contains(search) ||
-                    r.User.Name.Contains(search) ||
-                    r.Car.Name.Contains(search)
-                );
-            }
-            else
-            {
-                query = query.Include(r => r.Car).Include(r => r.User);
-            }
-            query = query.OrderByDescending(r => r.CreatedAt);
-            if (ViewData["Role"] as string != "admin"){
-                query = query.Where(r => r.User.Id == Guid.Parse(ViewData["UserId"] as string));
-            }
-            var totalRent = await query.CountAsync();
-            var totalPages = (int) Math.Ceiling((double) totalRent / limit);
-            var rents = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
-            var Pagination = new Pagination
-            {
-                Page = page,
-                Limit = limit,
-                TotalPages = totalPages,
-                DataCount = totalRent,
-                Search = search
-            };
-            var RentListView = new RentListView
-            {
-                Pagination = Pagination,
-                Rents = rents
-            };
-            return RentListView;
+            _service = service;
         }
 
         [Authorize(Roles = "admin")]
         [TypeFilter(typeof(ValidateCookie))]
         public async Task<IActionResult> Admin(int page = 1, int limit = 5, string search = "")
         {
-            var RentListView = await rentListView(page, limit, search);
+            var RentListView = await _service.GetRentList(page, limit, search);
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -101,7 +62,7 @@ namespace Coba_Net.Controllers
         [TypeFilter(typeof(ValidateCookie))]
         public new async Task<IActionResult> User(int page = 1, int limit = 5, string search = "")
         {
-            var RentListView = await rentListView(page, limit, search);
+            var RentListView = await _service.GetRentList(page, limit, search, Guid.Parse(ViewData["UserId"] as string));
             if (TempData.TryGetValue("Message", out var message))
             {
                 ViewData["Message"] = message;
@@ -134,24 +95,7 @@ namespace Coba_Net.Controllers
             }
             if (ModelState.IsValid)
             {
-                string uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-                if (!Directory.Exists(uploadsFolderPath))
-                {
-                    Directory.CreateDirectory(uploadsFolderPath);
-                }
-                var uuid = Guid.NewGuid();
-                string uniqueFileName = uuid.ToString() + Path.GetExtension(PdfFile.FileName);
-                string filePath = Path.Combine(uploadsFolderPath, uniqueFileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await PdfFile.CopyToAsync(stream);
-                }
-                string baseUrl = Request.Scheme + "://" + Request.Host;
-                rent.UserId = Guid.Parse(ViewData["UserId"] as string);
-                rent.Id = uuid;
-                rent.FormUrl = baseUrl + "/Rent/File/" + uniqueFileName;
-                await _context.Rents.AddAsync(rent);
-                await _context.SaveChangesAsync();
+                await _service.RequestRent(rent, PdfFile, Guid.Parse(ViewData["UserId"] as string));
                 TempData["Message"] = "Rent requested successfully";
                 return Redirect("/Rent/User");
             }
@@ -224,11 +168,9 @@ namespace Coba_Net.Controllers
                 return Redirect("/NotFound.html");
             }
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using (var memoryStream = new MemoryStream())
-            {
-                await fileStream.CopyToAsync(memoryStream);
-                return File(memoryStream.ToArray(), "application/pdf");
-            }
+            using var memoryStream = new MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+            return File(memoryStream.ToArray(), "application/pdf");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
