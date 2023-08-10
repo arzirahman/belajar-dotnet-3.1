@@ -22,7 +22,9 @@ namespace Coba_Net.Services
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<CarListView> GetCarList(int page = 1, int limit = 5, string search = "")
+        public async Task<CarListView> GetCarList(
+            int page = 1, int limit = 5, string search = "", string sortBy = "CreatedAt", string sortOrder = "desc"
+        )
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
@@ -35,7 +37,21 @@ namespace Coba_Net.Services
                     car.Color.Contains(search)
                 );
             }
-            query = query.OrderByDescending(car => car.CreatedAt);
+            if (sortBy == "Name")
+            {
+                if (sortOrder == "desc") query = query.OrderByDescending(car => car.Name);
+                else query = query.OrderBy(car => car.Name);
+            }
+            else if (sortBy == "Price")
+            {
+                if (sortOrder == "asc") query = query.OrderBy(car => car.Price);
+                else query = query.OrderByDescending(car => car.Price);
+            }
+            else
+            {
+                if (sortOrder == "asc") query = query.OrderBy(car => car.CreatedAt);
+                else query = query.OrderByDescending(car => car.CreatedAt);
+            }
             var totalCars = query.Count();
             var totalPages = (int) Math.Ceiling((double) totalCars / limit);
             var cars = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
@@ -47,10 +63,16 @@ namespace Coba_Net.Services
                 DataCount = totalCars,
                 Search = search
             };
+            var Sort = new Sort
+            {
+                SortBy = sortBy,
+                SortOrder = sortOrder
+            };
             var CarListView = new CarListView
             {
                 Pagination = Pagination,
-                Cars = cars
+                Cars = cars,
+                Sort = Sort
             };
             return CarListView;
         }
@@ -110,7 +132,9 @@ namespace Coba_Net.Services
                 var url = await UploadFile(file, fileName);
                 car.PicUrl = existingCar.PicUrl ?? url;
             }
+            var createdAt = existingCar.CreatedAt;
             _dbContext.Entry(existingCar).CurrentValues.SetValues(car);
+            existingCar.CreatedAt = createdAt;
             await _dbContext.SaveChangesAsync();
         }
 

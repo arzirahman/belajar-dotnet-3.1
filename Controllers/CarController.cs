@@ -35,9 +35,11 @@ namespace Coba_Net.Controllers
             _service = service;
         }
         
-        public async Task<IActionResult> Index(int page = 1, int limit = 5, string search = "")
+        public async Task<IActionResult> Index(
+            int page = 1, int limit = 5, string search = "", string sortBy = "CreatedAt", string sortOrder = "desc"
+        )
         {
-            var CarListView = await _service.GetCarList(page, limit, search);
+            var CarListView = await _service.GetCarList(page, limit, search, sortBy, sortOrder);
             if (TempData.TryGetValue("ModelStateError", out var errorMessageObject) && errorMessageObject is Dictionary<string, string> errors)
             {
                 foreach (var (key, errorMessage) in errors)

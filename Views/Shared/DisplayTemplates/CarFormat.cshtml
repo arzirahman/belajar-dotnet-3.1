@@ -5,6 +5,7 @@
     var brand = Model.Dictionary["Brand"];
     var color = Model.Dictionary["Color"];
     var price = Model.Dictionary["Price"];
+    var arrival = (DateTime) Model.Dictionary["CreatedAt"];
     var url = Model.Dictionary["PicUrl"] ?? "";
 }
 
@@ -14,7 +15,13 @@
 }
 else if(Model.Key == "Detail")
 {
-    <button class="rounded-md bg-[#116D6E] p-2 px-4" onclick="viewCarDetail('@name','@brand','@color','@price','@url')">Detail</button>
+    <button class="rounded-md bg-[#116D6E] p-2 px-4" onclick="viewCarDetail('@name','@brand','@color','@price','@url','@arrival')">Detail</button>
+}
+else if(Model.Key == "CreatedAt")
+{
+    <div>
+        @arrival.ToString("dd MMM yyyy") @arrival.TimeOfDay.ToString(@"hh\:mm\:ss")
+    </div>
 }
 else
 {

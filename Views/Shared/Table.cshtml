@@ -6,20 +6,37 @@
         <tr>
             @foreach (var header in Model.Headers)
             {
-                <th class="p-3 text-lg">@header</th>
+                <th class="p-3 text-lg">
+                    <div class="flex gap-2 justify-center items-center">
+                        <span>@header.Label</span>
+                        @if (header.EnableSort)
+                        {
+                            @await Html.PartialAsync("~/Views/Shared/Sort.cshtml", new SortProps{
+                                Current = Model.Sort,
+                                Key = header.Key,
+                                Url = Model.SortPath
+                            })
+                        }
+                    </div>
+                </th>
             }
+            <th class="p-3 text-lg">
+                <div class="flex gap-2 justify-center items-center">
+                    <span>Action</span>
+                </div>
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var data in Model.List)
         {
             <tr>
-                @foreach (var key in Model.Keys)
+                @foreach (var key in Model.Headers)
                 {
                     var formatter = new Formatter();
                     var dictionary = formatter.ObjectToDictionary(data);
                     <td class="p-2 bg-[#1B2430] border-y-[2px] border-[#121212] text-center">
-                        @(Model?.BodyFormatter != null ? @Model.BodyFormatter(key, dictionary) : dictionary[key])
+                        @(Model?.BodyFormatter != null ? @Model.BodyFormatter(key.Key, dictionary) : dictionary[key.Key])
                     </td>
                 }
                 @await Html.PartialAsync("~/Views/Shared/TableAction.cshtml", new TableActionProps {

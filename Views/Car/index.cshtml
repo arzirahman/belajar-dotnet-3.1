@@ -1,15 +1,19 @@
 @model CarListView
 @{
-
     ViewData["Title"] = "Car List";
-    var headers = new[] { "Name", "Price", "Detail", "Action" };
-    var keys = new[] { "Name", "Price", "Detail" };
+    var headers = new Header[] { 
+        new Header { Label = "Name", EnableSort = true, Key = "Name" },
+        new Header{ Label = "Price", EnableSort = true, Key = "Price" },
+        new Header{ Label = "Arrival", EnableSort = true, Key = "CreatedAt" },
+        new Header{ Label = "Detail", Key = "Detail" }
+    };
     var tableProps = new TableProps {
         Headers = headers,
-        Keys = keys,
         List = Model.Cars,
+        Sort = Model.Sort,
         UpdatePath = "/Car/Edit",
         DeletePath = "/Car/Delete",
+        SortPath = "/Car",
         BodyFormatter = (key, dictionary) => {
             var model = new CarFormatModel{ Key = key, Dictionary = dictionary };
             return Html.DisplayFor(m => model, "CarFormat");
