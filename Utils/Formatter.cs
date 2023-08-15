@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Coba_Net.Utils
 {
@@ -32,6 +33,21 @@ namespace Coba_Net.Utils
         {
             string pattern = @"^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$";
             return Regex.IsMatch(email, pattern);
+        }
+
+        public string GenerateRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            Random random = new Random();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < length; i++)
+            {
+                int index = random.Next(chars.Length);
+                stringBuilder.Append(chars[index]);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

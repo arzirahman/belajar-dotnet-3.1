@@ -38,6 +38,8 @@ namespace Coba_Net.Models
         public List<Car> Cars { set; get; }
         public Pagination Pagination { set; get; }
         public Sort Sort { set; get; }
+        public List<string> BrandFilter { get; set; }
+        public List<string> ColorFilter { get; set; }
     }
 
     public class CarFormatModel

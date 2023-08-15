@@ -23,12 +23,16 @@ namespace Coba_Net.Services
         }
 
         public async Task<CarListView> GetCarList(
-            int page = 1, int limit = 5, string search = "", string sortBy = "CreatedAt", string sortOrder = "desc"
+            int page = 1, int limit = 5, string search = "", string sortBy = "CreatedAt", string sortOrder = "desc",
+            string brand = "", string color = ""
         )
         {
             page = page <= 0 ? 1 : page;
             limit = limit <= 0 ? 5 : limit;
             var query = _dbContext.Cars.AsQueryable();
+            var carList = await _dbContext.Cars.ToListAsync();
+            var brandList = carList.Select(c => c.Brand).Distinct().ToList();
+            var colorList = carList.Select(c => c.Color).Distinct().ToList();
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(car =>
@@ -36,6 +40,12 @@ namespace Coba_Net.Services
                     car.Brand.Contains(search) ||
                     car.Color.Contains(search)
                 );
+            }
+            if (!string.IsNullOrEmpty(brand)) {
+                query = query.Where(car => car.Brand == brand);
+            }
+            if (!string.IsNullOrEmpty(color)) {
+                query = query.Where(car => car.Color == color);
             }
             if (sortBy == "Name")
             {
@@ -68,11 +78,14 @@ namespace Coba_Net.Services
                 SortBy = sortBy,
                 SortOrder = sortOrder
             };
+
             var CarListView = new CarListView
             {
                 Pagination = Pagination,
                 Cars = cars,
-                Sort = Sort
+                Sort = Sort,
+                BrandFilter = brandList,
+                ColorFilter = colorList
             };
             return CarListView;
         }

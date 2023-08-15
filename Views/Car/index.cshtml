@@ -31,6 +31,16 @@
         Path = "/Car/Index",
         Count = Model.Cars.Count
     };
+    var DropdownFilterBrand = new DropdownFilter{
+        FilterBy = "Brand",
+        DropdownList = Model.BrandFilter,
+        Label = "Filter By Brand"
+    };
+    var DropdownFilterColor = new DropdownFilter{
+        FilterBy = "Color",
+        DropdownList = Model.ColorFilter,
+        Label = "Filter By Color"
+    };
     var fileError = ViewData.ModelState["file"]?.Errors?.FirstOrDefault()?.ErrorMessage;
 }
 
@@ -56,6 +66,11 @@
     </form>
     
     @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
+
+    <div class="flex w-full px-10 flex-wrap gap-4">
+        @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterBrand)
+        @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterColor)
+    </div>
 
     <div class="px-10 w-full">
         <div class="bg-[#1e1e1e] shadow-lg rounded-xl w-full overflow-x-auto">

@@ -28,9 +28,11 @@ namespace Coba_Net.Controllers
 
         [Authorize]
         [TypeFilter(typeof(ValidateCookie))]
-        public async Task<IActionResult> Index(int page = 1, int limit = 6, string search = "")
+        public async Task<IActionResult> Index(int page = 1, int limit = 6, string search = "", string Brand = "", string Color = "")
         {
-            var CarListView = await _carService.GetCarList(page, limit, search);
+            ViewData["CurrentPath"] = Request.Path;
+            ViewData["QueryString"] = Request.QueryString.ToString();
+            var CarListView = await _carService.GetCarList(page, limit, search, "", "desc", Brand, Color);
             return View(CarListView);
         }
 

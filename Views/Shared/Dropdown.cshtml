@@ -1,0 +1,54 @@
+@model DropdownFilter
+@using Coba_Net.Utils
+@{
+    var rand = new Formatter{}.GenerateRandomString(5);
+    string currentPath = ViewData["CurrentPath"].ToString();
+    string queryString = ViewData["QueryString"].ToString();
+    string filterBy = Model.FilterBy;
+    string selectedValue = string.Empty;
+    string separator = string.IsNullOrEmpty(queryString) ? "?" : "";
+    if (!string.IsNullOrEmpty(queryString))
+    {
+        var queryCollection = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(queryString);
+        if (queryCollection.ContainsKey(filterBy))
+        {
+            selectedValue = queryCollection[filterBy];
+        }
+    }
+    queryString = queryString.Replace($"&{filterBy}={selectedValue}", "");
+    string clearPath = $"{currentPath}{queryString}";
+    string path = $"{currentPath}{queryString}{separator}&{filterBy}";
+}
+
+<div class="flex flex-col flex-1 gap-1 md:max-w-[400px] relative">
+    <span>@Model.Label</span>
+    <button id="select-@rand" class="bg-[#4e4f3e] h-[48px] w-full p-2 pl-4 py-3 rounded-lg flex gap-2 items-center">
+        <div class="flex-1 text-start">@selectedValue</div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+        </svg>
+    </button>
+    <div id="select-drop-@rand" class="hidden absolute top-[calc(100%+2px)] z-[5] left-0 rounded-lg py-2 bg-[#4e4f3e] flex flex-col w-full">
+        <a href="@clearPath" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">Clear Filter</a>
+        @foreach(var dropdown in Model.DropdownList){
+            <a href="@path=@dropdown" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">@dropdown</a>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const select = document.getElementById("select-@rand")
+        const dropdownMenu = document.getElementById("select-drop-@rand")
+
+        select.addEventListener("click", function() {
+            dropdownMenu.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", function(event) {
+            if (!select.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add("hidden");
+            }
+        });
+    });
+</script>

@@ -10,6 +10,16 @@
         Path = "/Home",
         Count = Model.Cars.Count
     };
+    var DropdownFilterBrand = new DropdownFilter{
+        FilterBy = "Brand",
+        DropdownList = Model.BrandFilter,
+        Label = "Filter By Brand"
+    };
+    var DropdownFilterColor = new DropdownFilter{
+        FilterBy = "Color",
+        DropdownList = Model.ColorFilter,
+        Label = "Filter By Color"
+    };
 }
 
 <div class="flex flex-col gap-10 pb-10 h-full overflow-y-auto flex-1">
@@ -23,6 +33,10 @@
         </div>
     </div>
     @await Html.PartialAsync("~/Views/Shared/SearchBar.cshtml", searchBarProps)
+    <div class="flex w-full px-10 flex-wrap gap-4">
+        @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterBrand)
+        @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterColor)
+    </div>
     <div class="px-10 w-full flex flex-wrap gap-10">
         @if (Model.Cars.Count > 0)
         {
