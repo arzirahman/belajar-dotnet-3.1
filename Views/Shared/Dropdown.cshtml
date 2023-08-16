@@ -1,3 +1,4 @@
+@using Coba_Net.Models
 @model DropdownFilter
 @using Coba_Net.Utils
 @{
@@ -6,7 +7,6 @@
     string queryString = ViewData["QueryString"].ToString();
     string filterBy = Model.FilterBy;
     string selectedValue = string.Empty;
-    string separator = string.IsNullOrEmpty(queryString) ? "?" : "";
     if (!string.IsNullOrEmpty(queryString))
     {
         var queryCollection = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(queryString);
@@ -15,12 +15,9 @@
             selectedValue = queryCollection[filterBy];
         }
     }
-    queryString = queryString.Replace($"&{filterBy}={selectedValue}", "");
-    string clearPath = $"{currentPath}{queryString}";
-    string path = $"{currentPath}{queryString}{separator}&{filterBy}";
 }
 
-<div class="flex flex-col flex-1 gap-1 md:max-w-[400px] relative">
+<div class="flex flex-col flex-1 gap-1 md:min-w-[120px] min-w-[200px] md:max-w-[250px] relative">
     <span>@Model.Label</span>
     <button id="select-@rand" class="bg-[#4e4f3e] h-[48px] w-full p-2 pl-4 py-3 rounded-lg flex gap-2 items-center">
         <div class="flex-1 text-start">@selectedValue</div>
@@ -29,9 +26,9 @@
         </svg>
     </button>
     <div id="select-drop-@rand" class="hidden absolute top-[calc(100%+2px)] z-[5] left-0 rounded-lg py-2 bg-[#4e4f3e] flex flex-col w-full">
-        <a href="@clearPath" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">Clear Filter</a>
+        <button id="clear-@rand" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">Clear Filter</button>
         @foreach(var dropdown in Model.DropdownList){
-            <a href="@path=@dropdown" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">@dropdown</a>
+            <button onclick="selectFilter('@filterBy', '@dropdown')" class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">@dropdown</button>
         }
     </div>
 </div>
@@ -40,9 +37,16 @@
     document.addEventListener("DOMContentLoaded", function() {
         const select = document.getElementById("select-@rand")
         const dropdownMenu = document.getElementById("select-drop-@rand")
+        const clear = document.getElementById("clear-@rand")
 
         select.addEventListener("click", function() {
             dropdownMenu.classList.toggle("hidden");
+        });
+
+        clear.addEventListener("click", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set("@filterBy", "");
+            window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
         });
 
         document.addEventListener("click", function(event) {
@@ -51,4 +55,10 @@
             }
         });
     });
+
+    function selectFilter(filterBy = "", data = ""){
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set(filterBy, data);
+        window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+    }
 </script>

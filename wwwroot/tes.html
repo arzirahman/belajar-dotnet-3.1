@@ -11,34 +11,12 @@
         <div class="w-full">
             <div class="flex w-full justify flex-wrap gap-4 items-end">
                 <div class="flex flex-col flex-1 gap-1 md:max-w-[400px] relative">
-                    <span>Filter By Date</span>
-                    <button id="select" class="bg-[#4e4f3e] w-full p-2 pl-4 rounded-lg flex gap-2 items-center">
-                        <div class="flex-1 text-start">lol</div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                        </svg>
-                    </button>
-                    <div id="select-content" class="hidden absolute top-[calc(100%+2px)] left-0 rounded-lg py-2 bg-[#4e4f3e] flex flex-col w-full">
-                        <button class="hover:bg-[#3c3d2f] p-2 pl-4 text-start">lol</button>
+                    <span>@Model.Label</span>
+                    <div class="flex gap-2 w-full items-center">
+                        <input class="bg-[#4e4f3e] h-[48px] w-full p-2 pl-4 py-3 rounded-lg flex gap-2 items-center" />
+                        <span>To</span>
+                        <input class="bg-[#4e4f3e] h-[48px] w-full p-2 pl-4 py-3 rounded-lg flex gap-2 items-center" />
                     </div>
-                </div>
-                <div class="flex flex-col flex-1 gap-1 md:max-w-[400px]">
-                    <span>Filter By Date</span>
-                    <input class="bg-[#4e4f3e] w-full p-2 pl-4 rounded-lg" />
-                </div>
-                <div class="flex flex-col flex-1 gap-1 md:max-w-[400px]">
-                    <span>Filter By Date</span>
-                    <input class="bg-[#4e4f3e] w-full p-2 pl-4 rounded-lg" />
-                </div>
-                <div class="flex flex-col flex-1 gap-1 md:max-w-[155px]">
-                    <a class='w-full' href="@Model.ButtonPath">
-                        <button class="bg-[#2D4263] w-full shadow-lg pr-6 flex items-center gap-2 shadow-lg p-3 font-bold text-3xl rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                            </svg>
-                            <span class="text-base">Apply Filter</span>
-                        </button>
-                    </a>
                 </div>
             </div>
         </div>

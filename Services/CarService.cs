@@ -24,7 +24,7 @@ namespace Coba_Net.Services
 
         public async Task<CarListView> GetCarList(
             int page = 1, int limit = 5, string search = "", string sortBy = "CreatedAt", string sortOrder = "desc",
-            string brand = "", string color = ""
+            string brand = "", string color = "", string fromPrice = "", string toPrice = ""
         )
         {
             page = page <= 0 ? 1 : page;
@@ -46,6 +46,12 @@ namespace Coba_Net.Services
             }
             if (!string.IsNullOrEmpty(color)) {
                 query = query.Where(car => car.Color == color);
+            }
+            if (decimal.TryParse(fromPrice, out decimal priceFromValue)) {
+                query = query.Where(car => car.Price >= priceFromValue);
+            }
+            if (decimal.TryParse(toPrice, out decimal priceToValue)) {
+                query = query.Where(car => car.Price <= priceToValue);
             }
             if (sortBy == "Name")
             {

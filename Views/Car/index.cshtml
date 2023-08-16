@@ -1,3 +1,4 @@
+@using Coba_Net.Models
 @model CarListView
 @{
     ViewData["Title"] = "Car List";
@@ -41,6 +42,11 @@
         DropdownList = Model.ColorFilter,
         Label = "Filter By Color"
     };
+    var RangePriceFilter = new RangeFilter{
+        Label = "Filter By Price",
+        From = "FromPrice",
+        To = "ToPrice"
+    };
     var fileError = ViewData.ModelState["file"]?.Errors?.FirstOrDefault()?.ErrorMessage;
 }
 
@@ -70,6 +76,7 @@
     <div class="flex w-full px-10 flex-wrap gap-4">
         @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterBrand)
         @await Html.PartialAsync("~/Views/Shared/Dropdown.cshtml", DropdownFilterColor)
+        @await Html.PartialAsync("~/Views/Shared/RangeFilter.cshtml", RangePriceFilter)
     </div>
 
     <div class="px-10 w-full">
